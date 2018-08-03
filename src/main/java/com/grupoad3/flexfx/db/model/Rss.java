@@ -40,13 +40,13 @@ public class Rss {
     @DatabaseField(columnName = ID_FIELD_NAME, generatedId = true)
     private Integer _id;
     private IntegerProperty id;
-    @DatabaseField(columnName = TITLE_FIELD_NAME)
+    @DatabaseField(columnName = TITLE_FIELD_NAME, canBeNull = false, width = 200, index = true)
     private String _title;
     private StringProperty title;
-    @DatabaseField(columnName = LINK_RSS_FIELD_NAME)
+    @DatabaseField(columnName = LINK_RSS_FIELD_NAME, canBeNull = false, columnDefinition = "TEXT", uniqueIndex = true, indexName = "rss_link_rss_link_web_idx")
     private String _linkrss;
     private StringProperty linkrss;
-    @DatabaseField(columnName = LINK_WEB_FIELD_NAME)
+    @DatabaseField(columnName = LINK_WEB_FIELD_NAME, columnDefinition = "TEXT", indexName = "rss_link_rss_link_web_idx")
     private String _linkweb;
     private StringProperty linkweb;
     @DatabaseField(columnName = PUB_DATE_FIELD_NAME, persisterClass = LocalDateTimePersister.class)
@@ -58,16 +58,16 @@ public class Rss {
     @DatabaseField(columnName = DESCRIPTION_FIELD_NAME)
     private String _description;
     private StringProperty description;
-    @DatabaseField(columnName = ITEM_MOSTNEW_FIELD_NAME)
+    @DatabaseField(columnName = ITEM_MOSTNEW_FIELD_NAME, columnDefinition = "TEXT")
     private String _itemmostnew;
     private StringProperty itemmostnew;
     @DatabaseField(columnName = DELETED_FIELD_NAME)
     private Boolean _deleted;
     private BooleanProperty deleted;
-    @DatabaseField(columnName = FMOD_FIELD_NAME, persisterClass = LocalDateTimePersister.class)
+    @DatabaseField(columnName = FMOD_FIELD_NAME, persisterClass = LocalDateTimePersister.class, canBeNull = false)
     private LocalDateTime _fmod;
     private ObjectProperty<LocalDateTime> fmod;
-    @DatabaseField(columnName = FADD_FIELD_NAME, persisterClass = LocalDateTimePersister.class)
+    @DatabaseField(columnName = FADD_FIELD_NAME, persisterClass = LocalDateTimePersister.class, canBeNull = false)
     private LocalDateTime _fadd;
     private ObjectProperty<LocalDateTime> fadd;
 
