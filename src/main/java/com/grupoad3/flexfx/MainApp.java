@@ -1,0 +1,142 @@
+package com.grupoad3.flexfx;
+
+import com.grupoad3.flexfx.controller.MainController;
+import com.grupoad3.flexfx.db.DatabaseUtils;
+import com.grupoad3.flexfx.db.model.Rss;
+import com.grupoad3.flexfx.db.services.RssService;
+import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
+import com.j256.ormlite.table.TableUtils;
+import java.io.IOException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.application.Application;
+import static javafx.application.Application.launch;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.image.Image;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
+
+public class MainApp extends Application {
+
+    private final Image iconoApp = new Image(getClass().getResourceAsStream("/img/icon.png"));            
+    private Stage primaryStage;
+    private final ObservableList<Rss> rssData = FXCollections.observableArrayList();
+    
+    public ObservableList<Rss> getRssData() {
+        return rssData;
+    }
+
+    public Stage getPrimaryStage() {
+        return primaryStage;
+    }
+
+    @Override
+    public void start(Stage stage) throws Exception {
+         
+        primaryStage = stage;
+        primaryStage.setTitle("FlexFX");
+        primaryStage.getIcons().add(iconoApp);
+
+        initProperties();
+        initDBMigration();
+        initData();
+        
+        showMainViewWindow();
+        
+
+        
+    }
+
+    private void showMainViewWindow() {
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/fxml/MainView.fxml"));
+            BorderPane mainWindow = (BorderPane) loader.load();
+
+            // Show the scene containing the root layout.
+            Scene scene = new Scene(mainWindow);
+
+            primaryStage.setScene(scene);
+            primaryStage.show();
+            
+            // Poniendo el controlador de la vista y poniendo la app contenedora.
+            MainController controlador = loader.getController();
+            controlador.setMainApp(this);
+            
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
+     * The main() method is ignored in correctly deployed JavaFX application.
+     * main() serves only as fallback in case the application can not be
+     * launched through deployment artifacts, e.g., in IDEs with limited FX
+     * support. NetBeans ignores main().
+     *
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+    private void initProperties() {
+        try {
+            ConfigApp config = new ConfigApp();
+            config.setup();
+            config.loadProperties();
+            
+        } catch (Exception ex) {
+            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void initData() {
+        try {
+            RssService rssService = new RssService();                                         
+            
+            List<Rss> listRss = rssService.getLastRss(10, 0, true);
+            listRss.forEach((r) -> {
+                rssData.add(r);
+            });
+            
+        } catch (IOException ex) {
+            Alert alerta = new Alert(Alert.AlertType.ERROR);
+            alerta.setContentText("Error:" + ex.getMessage());
+            alerta.setHeaderText(null);
+            alerta.setTitle("Error");
+                        
+            alerta.showAndWait();
+        }
+    }
+   
+
+    private void initDBMigration() {
+        try {
+            ConfigApp config = new ConfigApp();
+            config.loadProperties();
+            String isMigrated = ConfigApp.readProperty(ConfigApp.ConfigTypes.ISMIGRATED);
+            
+            if (isMigrated != null && isMigrated.equals("false")) {
+                JdbcPooledConnectionSource connection = DatabaseUtils.getConexion();
+                
+                // Tables
+                TableUtils.createTableIfNotExists(connection, Rss.class);
+                
+                // Writeproperties
+                config.writeProperty(ConfigApp.ConfigTypes.ISMIGRATED, "true");
+                
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+}

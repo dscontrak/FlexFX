@@ -1,0 +1,7 @@
+target/
+database.db
+config.properties
+*.zip
+*.rar
+*.7z
+*.epgz
