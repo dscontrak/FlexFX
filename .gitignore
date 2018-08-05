@@ -6,3 +6,4 @@ config.properties
 *.rar
 *.7z
 *.epgz
+/nbproject/

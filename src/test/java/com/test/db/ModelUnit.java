@@ -5,6 +5,12 @@
  */
 package com.test.db;
 
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 /**
  *
  * @author daniel
@@ -12,8 +18,27 @@ package com.test.db;
 
 public class ModelUnit {
     
-    //@Test
-    public void rssCreate(){
+    @BeforeClass
+    public static void setUpClass() {
+    }
+    
+    @AfterClass
+    public static void tearDownClass() {
+    }
+    
+    @Before
+    public void setUp() {
+    }
+    
+    @After
+    public void tearDown() {
+    }
+
+    // TODO add test methods here.
+    // The methods must be annotated with annotation @Test. For example:
+    //
+    @Test
+    public void rssCreate() {
         
     }
     
