@@ -6,7 +6,9 @@
 package com.grupoad3.flexfx.db.services;
 
 import com.grupoad3.flexfx.db.AbstractDaoService;
+import com.grupoad3.flexfx.db.model.MediaFilters;
 import com.grupoad3.flexfx.db.model.Rss;
+import com.grupoad3.flexfx.db.model.RssItems;
 import com.j256.ormlite.stmt.QueryBuilder;
 import java.io.IOException;
 import java.util.List;
@@ -16,13 +18,13 @@ import java.util.List;
  * @author daniel_serna
  */
 @SuppressWarnings("unchecked")
-public class RssService extends AbstractDaoService<Rss>{
+public class MediaFilterService extends AbstractDaoService<MediaFilters>{
     
-    public RssService() {
-        super(Rss.class);        
+    public MediaFilterService() {
+        super(MediaFilters.class);        
     }
     
-    public List<Rss> getLastRss(long limit, long offset, boolean withDeleted) throws IOException{
+    public List<MediaFilters> getLast(long limit, long offset, boolean withDeleted) throws IOException{
         
         // return all with deleted
         if (withDeleted) {
@@ -40,13 +42,35 @@ public class RssService extends AbstractDaoService<Rss>{
                     builder.offset(offset);
                 }
                 
-                builder.where().eq(Rss.DELETED_FIELD_NAME, false);
+                builder.where().eq(RssItems.DELETED_FIELD_NAME, false);
                 return builder.query();
                 
             } catch (Exception e) {
-
+                e.printStackTrace();
             }
         }
+        
+        return null;
+    }
+    
+    public List<RssItems> getLastItemsByRss(Rss rss, long limit, long offset ){
+        try {
+            QueryBuilder builder = dao.queryBuilder();                
+                if(limit != -1l)
+                {
+                    builder.limit(limit);
+                }
+                
+                if(offset != -1l){
+                    builder.offset(offset);
+                }
+                
+                builder.where().eq(RssItems.ID_RSS_FIELD_NAME, rss.getId());
+                
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
         
         return null;
     }

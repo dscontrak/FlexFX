@@ -44,6 +44,7 @@ public abstract class AbstractDaoService<T> {
             dao = DaoManager.createDao(connection, clazz);
 
         } catch (SQLException | IOException e) {
+            e.printStackTrace();
             throw new IllegalStateException(e);
         }
     }
@@ -73,6 +74,7 @@ public abstract class AbstractDaoService<T> {
         try {
             TableUtils.clearTable(connection, clazz);
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new IOException(e);
         }
     }
@@ -87,6 +89,7 @@ public abstract class AbstractDaoService<T> {
         try {
             dao.deleteById(objectId);
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new IOException(e);
         }
     }
@@ -132,6 +135,7 @@ public abstract class AbstractDaoService<T> {
             dao.create(toCreate);
             return toCreate;
         } catch (SQLException e) {
+            e.printStackTrace();            
             throw new IOException(e);
         }
     }
@@ -152,6 +156,7 @@ public abstract class AbstractDaoService<T> {
         try {
             dao.refresh(obj);
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new IOException(e);
         }
     }
@@ -193,6 +198,7 @@ public abstract class AbstractDaoService<T> {
             }
             return builder.query();
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new IOException(e);
         }
     }
@@ -208,6 +214,7 @@ public abstract class AbstractDaoService<T> {
         try {
             return dao.update(obj);
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new IOException(e);
         }
     }
@@ -227,6 +234,7 @@ public abstract class AbstractDaoService<T> {
             }
             return result;
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new IOException(e);
         }
     }

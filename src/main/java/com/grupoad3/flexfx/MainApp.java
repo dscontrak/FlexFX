@@ -2,11 +2,16 @@ package com.grupoad3.flexfx;
 
 import com.grupoad3.flexfx.controller.MainController;
 import com.grupoad3.flexfx.db.DatabaseUtils;
+import com.grupoad3.flexfx.db.model.MediaFilters;
 import com.grupoad3.flexfx.db.model.Rss;
+import com.grupoad3.flexfx.db.model.RssItems;
+import com.grupoad3.flexfx.db.services.MediaFilterService;
+import com.grupoad3.flexfx.db.services.RssItemService;
 import com.grupoad3.flexfx.db.services.RssService;
 import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -107,6 +112,45 @@ public class MainApp extends Application {
                 rssData.add(r);
             });
             
+            if(true){
+                
+                /*Rss r = new Rss();
+                r.setTitle("Titulo");
+                r.setLinkrss("LinkRss");
+                r.setFadd(LocalDateTime.now());
+                r.setFmod(LocalDateTime.now());
+                
+                rssService.create(r);*/
+                
+                /*RssItemService rssItemService = new RssItemService();
+                
+                RssItems item;
+                
+                item = new RssItems();                
+                item.setTitle("Titulo");
+                item.setGuid("dskjfsajfiosdjios");
+                item.setRss(rssData.get(0));
+                item.setStatus("I");
+                item.setLink("link tal");
+                
+                rssItemService.create(item);*/
+                
+                MediaFilterService mediaService = new MediaFilterService();
+                MediaFilters media = new MediaFilters();
+                
+                media.setTitle("Titulo");
+                media.setRss(rssData.get(0));
+                media.setTitle("TItulo");
+                media.setFiltermain("Filter main");
+                
+                mediaService.create(media);
+                
+                
+                
+                
+            }
+            
+            
         } catch (IOException ex) {
             Alert alerta = new Alert(Alert.AlertType.ERROR);
             alerta.setContentText("Error:" + ex.getMessage());
@@ -129,6 +173,8 @@ public class MainApp extends Application {
                 
                 // Tables
                 TableUtils.createTableIfNotExists(connection, Rss.class);
+                TableUtils.createTableIfNotExists(connection, RssItems.class);
+                TableUtils.createTableIfNotExists(connection, MediaFilters.class);
                 
                 // Writeproperties
                 config.writeProperty(ConfigApp.ConfigTypes.ISMIGRATED, "true");

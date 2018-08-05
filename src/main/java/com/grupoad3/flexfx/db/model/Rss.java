@@ -71,6 +71,14 @@ public class Rss {
     private LocalDateTime _fadd;
     private ObjectProperty<LocalDateTime> fadd;
 
+    public Rss() {
+        _fadd = LocalDateTime.now();
+        _fmod = LocalDateTime.now();
+        _deleted = false;
+    }
+
+    
+    
     public void setId(Integer id) {
         _id = id;
         if (this.id != null) {

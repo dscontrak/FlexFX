@@ -7,7 +7,9 @@ package com.grupoad3.flexfx.controller;
 
 import com.grupoad3.flexfx.MainApp;
 import com.grupoad3.flexfx.db.model.Rss;
+import java.time.format.DateTimeFormatter;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
@@ -21,6 +23,16 @@ public class MainController{
     private TableView<Rss> rssTable;
     @FXML
     private TableColumn<Rss, String> titleRssTable;
+    
+    @FXML
+    private Label lblRssTitle;
+    
+    @FXML
+    private Label lblRssUrl;
+    
+    @FXML
+    private Label lblRssLastSync;
+    
     
     // Reference to the main application.
     private MainApp mainApp;
@@ -50,6 +62,30 @@ public class MainController{
     private void initialize() {
         // Initialize the person table with the two columns.
         titleRssTable.setCellValueFactory(cellData -> cellData.getValue().titleProperty());        
+        
+        // Listener to selected element of list
+        showRssDetails(null);
+        
+        rssTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            showRssDetails(newValue);
+        });
+        
+    }
+
+    private void showRssDetails(Rss rss) {
+        if (rss != null) {
+            lblRssTitle.setText( rss.getTitle() );
+            lblRssUrl.setText( rss.getLinkrss() );
+            if(rss.getLastsync() != null){
+                lblRssLastSync.setText(rss.getLastsync().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));            
+            }
+            
+        }else{
+            lblRssTitle.setText( "" );
+            lblRssUrl.setText( "" );
+            lblRssLastSync.setText( "" );            
+            
+        }
     }
     
     

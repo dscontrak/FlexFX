@@ -5,13 +5,18 @@
  */
 package com.grupoad3.flexfx.db.model;
 
+import com.grupoad3.flexfx.db.LocalDateTimePersister;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 /**
  *
@@ -20,36 +25,74 @@ import javafx.beans.property.SimpleObjectProperty;
 @DatabaseTable(tableName = "rss_items")
 public class RssItems {
 
-    @DatabaseField(columnName = "id")
+    public static final String ID_FIELD_NAME = "id";
+    public static final String ID_RSS_FIELD_NAME = "rss_id";
+    public static final String ID_MEDIAFILTER_FIELD_NAME = "mediafilter_id";
+    public static final String STATUS_FIELD_NAME = "status";
+    public static final String TITLE_FIELD_NAME = "title";
+    public static final String LINK_FIELD_NAME = "link";
+    public static final String FILE_FIELD_NAME = "file";
+    public static final String GUID_FIELD_NAME = "guid";
+    public static final String DATE_PUB_FIELD_NAME = "date_pub";
+    public static final String DATE_DOWN_FIELD_NAME = "date_down";
+    public static final String FMOD_FIELD_NAME = "fmod";
+    public static final String FADD_FIELD_NAME = "fadd";
+    public static final String DELETED_FIELD_NAME = "deleted";
+
+    public RssItems() {
+        _status = ItemStatus.IGNORED;
+        _deleted = false;
+        _fadd = LocalDateTime.now();
+        _fmod = LocalDateTime.now();
+    }
+    
+    
+
+    @DatabaseField(columnName = ID_FIELD_NAME, generatedId = true)
     private Integer _id;
     private IntegerProperty id;
-    @DatabaseField(columnName = "id_rss")
+    /*@DatabaseField(columnName = ID_RSS_FIELD_NAME, canBeNull = false)
     private Integer _idrss;
-    private IntegerProperty idrss;
-    @DatabaseField(columnName = "id_mediafilter")
-    private Integer _idmediafilter;
-    private IntegerProperty idmediafilter;
-    @DatabaseField(columnName = "status")
-    private Integer _status;
-    private IntegerProperty status;
-    @DatabaseField(columnName = "title")
-    private Integer _title;
-    private IntegerProperty title;
-    @DatabaseField(columnName = "link")
-    private Integer _link;
-    private IntegerProperty link;
-    @DatabaseField(columnName = "file")
-    private Integer _file;
-    private IntegerProperty file;
-    @DatabaseField(columnName = "guid")
-    private Integer _guid;
-    private IntegerProperty guid;
-    @DatabaseField(columnName = "date_pub")
-    private LocalDate _datepub;
-    private ObjectProperty<LocalDate> datepub;
-    @DatabaseField(columnName = "date_down")
-    private LocalDate _datedown;
-    private ObjectProperty<LocalDate> datedown;
+    private IntegerProperty idrss;*/    
+    
+    @DatabaseField(canBeNull = false, foreign = true)
+    private Rss rss;    
+    
+    @DatabaseField(canBeNull = true, foreign = true)
+    private MediaFilters mediafilter;    
+    /*private Integer _idmediafilter;
+    private IntegerProperty idmediafilter;*/
+    
+    @DatabaseField(columnName = STATUS_FIELD_NAME, canBeNull = false)
+    private ItemStatus _status;
+    private StringProperty status;
+    @DatabaseField(columnName = TITLE_FIELD_NAME, canBeNull = false, index = true)
+    private String _title;
+    private StringProperty title;
+    @DatabaseField(columnName = LINK_FIELD_NAME, canBeNull = false)
+    private String _link;
+    private StringProperty link;
+    @DatabaseField(columnName = FILE_FIELD_NAME)
+    private String _file;
+    private StringProperty file;
+    @DatabaseField(columnName = GUID_FIELD_NAME, canBeNull = false, uniqueIndex = true)
+    private String _guid;
+    private StringProperty guid;
+    @DatabaseField(columnName = DATE_PUB_FIELD_NAME, persisterClass = LocalDateTimePersister.class)
+    private LocalDateTime _datepub;
+    private ObjectProperty<LocalDateTime> datepub;
+    @DatabaseField(columnName = DATE_DOWN_FIELD_NAME, persisterClass = LocalDateTimePersister.class)
+    private LocalDateTime _datedown;
+    private ObjectProperty<LocalDateTime> datedown;
+    @DatabaseField(columnName = FMOD_FIELD_NAME, persisterClass = LocalDateTimePersister.class)
+    private LocalDateTime _fmod;
+    private ObjectProperty<LocalDateTime> fmod;
+    @DatabaseField(columnName = FADD_FIELD_NAME, persisterClass = LocalDateTimePersister.class)
+    private LocalDateTime _fadd;
+    private ObjectProperty<LocalDateTime> fadd;
+    @DatabaseField(columnName = DELETED_FIELD_NAME)
+    private Boolean _deleted;
+    private BooleanProperty deleted;
 
     public void setId(Integer id) {
         _id = id;
@@ -73,7 +116,7 @@ public class RssItems {
         return id;
     }
 
-    public void setIdrss(Integer idrss) {
+    /*public void setIdrss(Integer idrss) {
         _idrss = idrss;
         if (this.idrss != null) {
             this.idrss.set(idrss);
@@ -93,9 +136,28 @@ public class RssItems {
             idrss = new SimpleIntegerProperty(this, "idrss", _idrss);
         }
         return idrss;
+    }*/
+
+    public Rss getRss() {
+        return rss;
     }
 
-    public void setIdmediafilter(Integer idmediafilter) {
+    public void setRss(Rss rss) {
+        this.rss = rss;
+    }
+
+    public MediaFilters getMediafilter() {
+        return mediafilter;
+    }
+
+    public void setMediafilter(MediaFilters mediafilter) {
+        this.mediafilter = mediafilter;
+    }
+    
+    
+    
+
+    /*public void setIdmediafilter(Integer idmediafilter) {
         _idmediafilter = idmediafilter;
         if (this.idmediafilter != null) {
             this.idmediafilter.set(idmediafilter);
@@ -115,38 +177,38 @@ public class RssItems {
             idmediafilter = new SimpleIntegerProperty(this, "idmediafilter", _idmediafilter);
         }
         return idmediafilter;
-    }
+    }*/
 
-    public void setStatus(Integer status) {
+    public void setStatus(ItemStatus status) {
         _status = status;
         if (this.status != null) {
-            this.status.set(status);
+            this.status.set(status.toString());
         }
     }
 
-    public Integer getStatus() {
+    public String getStatus() {
         if (status == null) {
-            return _status;
+            return _status.toString();
         } else {
             return status.get();
         }
     }
 
-    public IntegerProperty statusProperty() {
+    public StringProperty statusProperty() {
         if (status == null) {
-            status = new SimpleIntegerProperty(this, "status", _status);
+            status = new SimpleStringProperty(this, "status", _status.toString());
         }
         return status;
     }
 
-    public void setTitle(Integer title) {
+    public void setTitle(String title) {
         _title = title;
         if (this.title != null) {
             this.title.set(title);
         }
     }
 
-    public Integer getTitle() {
+    public String getTitle() {
         if (title == null) {
             return _title;
         } else {
@@ -154,21 +216,21 @@ public class RssItems {
         }
     }
 
-    public IntegerProperty titleProperty() {
+    public StringProperty titleProperty() {
         if (title == null) {
-            title = new SimpleIntegerProperty(this, "title", _title);
+            title = new SimpleStringProperty(this, "title", _title);
         }
         return title;
     }
 
-    public void setLink(Integer link) {
+    public void setLink(String link) {
         _link = link;
         if (this.link != null) {
             this.link.set(link);
         }
     }
 
-    public Integer getLink() {
+    public String getLink() {
         if (link == null) {
             return _link;
         } else {
@@ -176,21 +238,21 @@ public class RssItems {
         }
     }
 
-    public IntegerProperty linkProperty() {
+    public StringProperty linkProperty() {
         if (link == null) {
-            link = new SimpleIntegerProperty(this, "link", _link);
+            link = new SimpleStringProperty(this, "link", _link);
         }
         return link;
     }
 
-    public void setFile(Integer file) {
+    public void setFile(String file) {
         _file = file;
         if (this.file != null) {
             this.file.set(file);
         }
     }
 
-    public Integer getFile() {
+    public String getFile() {
         if (file == null) {
             return _file;
         } else {
@@ -198,21 +260,21 @@ public class RssItems {
         }
     }
 
-    public IntegerProperty fileProperty() {
+    public StringProperty fileProperty() {
         if (file == null) {
-            file = new SimpleIntegerProperty(this, "file", _file);
+            file = new SimpleStringProperty(this, "file", _file);
         }
         return file;
     }
 
-    public void setGuid(Integer guid) {
+    public void setGuid(String guid) {
         _guid = guid;
         if (this.guid != null) {
             this.guid.set(guid);
         }
     }
 
-    public Integer getGuid() {
+    public String getGuid() {
         if (guid == null) {
             return _guid;
         } else {
@@ -220,21 +282,21 @@ public class RssItems {
         }
     }
 
-    public IntegerProperty guidProperty() {
+    public StringProperty guidProperty() {
         if (guid == null) {
-            guid = new SimpleIntegerProperty(this, "guid", _guid);
+            guid = new SimpleStringProperty(this, "guid", _guid);
         }
         return guid;
     }
 
-    public void setDatepub(LocalDate datepub) {
+    public void setDatepub(LocalDateTime datepub) {
         _datepub = datepub;
         if (this.datepub != null) {
             this.datepub.set(datepub);
         }
     }
 
-    public LocalDate getDatepub() {
+    public LocalDateTime getDatepub() {
         if (datepub == null) {
             return _datepub;
         } else {
@@ -242,21 +304,21 @@ public class RssItems {
         }
     }
 
-    public ObjectProperty<LocalDate> datepubProperty() {
+    public ObjectProperty<LocalDateTime> datepubProperty() {
         if (datepub == null) {
             datepub = new SimpleObjectProperty<>(this, "datepub", _datepub);
         }
         return datepub;
     }
 
-    public void setDatedown(LocalDate datedown) {
+    public void setDatedown(LocalDateTime datedown) {
         _datedown = datedown;
         if (this.datedown != null) {
             this.datedown.set(datedown);
         }
     }
 
-    public LocalDate getDatedown() {
+    public LocalDateTime getDatedown() {
         if (datedown == null) {
             return _datedown;
         } else {
@@ -264,11 +326,77 @@ public class RssItems {
         }
     }
 
-    public ObjectProperty<LocalDate> datedownProperty() {
+    public ObjectProperty<LocalDateTime> datedownProperty() {
         if (datedown == null) {
             datedown = new SimpleObjectProperty<>(this, "datedown", _datedown);
         }
         return datedown;
+    }
+
+    public void setFmod(LocalDateTime fmod) {
+        _fmod = fmod;
+        if (this.fmod != null) {
+            this.fmod.set(fmod);
+        }
+    }
+
+    public LocalDateTime getFmod() {
+        if (fmod == null) {
+            return _fmod;
+        } else {
+            return fmod.get();
+        }
+    }
+
+    public ObjectProperty<LocalDateTime> fmodProperty() {
+        if (fmod == null) {
+            fmod = new SimpleObjectProperty<>(this, "fmod", _fmod);
+        }
+        return fmod;
+    }
+
+    public void setFadd(LocalDateTime fadd) {
+        _fadd = fadd;
+        if (this.fadd != null) {
+            this.fadd.set(fadd);
+        }
+    }
+
+    public LocalDateTime getFadd() {
+        if (fadd == null) {
+            return _fadd;
+        } else {
+            return fadd.get();
+        }
+    }
+
+    public ObjectProperty<LocalDateTime> faddProperty() {
+        if (fadd == null) {
+            fadd = new SimpleObjectProperty<>(this, "fadd", _fadd);
+        }
+        return fadd;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        _deleted = deleted;
+        if (this.deleted != null) {
+            this.deleted.set(deleted);
+        }
+    }
+
+    public Boolean getDeleted() {
+        if (deleted == null) {
+            return _deleted;
+        } else {
+            return deleted.get();
+        }
+    }
+
+    public BooleanProperty deletedProperty() {
+        if (deleted == null) {
+            deleted = new SimpleBooleanProperty(this, "deleted", _deleted);
+        }
+        return deleted;
     }
 
 }

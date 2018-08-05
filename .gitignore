@@ -1,3 +1,4 @@
+_base/
 target/
 database.db
 config.properties
