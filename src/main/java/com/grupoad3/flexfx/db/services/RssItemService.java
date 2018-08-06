@@ -42,6 +42,7 @@ public class RssItemService extends AbstractDaoService<RssItems>{
                 }
                 
                 builder.where().eq(RssItems.DELETED_FIELD_NAME, false);
+                builder.orderBy(RssItems.FADD_FIELD_NAME, false);
                 return builder.query();
                 
             } catch (Exception e) {
@@ -65,6 +66,8 @@ public class RssItemService extends AbstractDaoService<RssItems>{
                 }
                 
                 builder.where().eq(RssItems.ID_RSS_FIELD_NAME, rss.getId());
+                
+                return builder.query();
                 
         } catch (Exception e) {
             e.printStackTrace();

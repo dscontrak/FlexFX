@@ -17,7 +17,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="600.0" maxWidth="900.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.181" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.grupoad3.flexfx.controller.MainController">
+<BorderPane maxHeight="600.0" maxWidth="900.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.grupoad3.flexfx.controller.MainController">
    <center>
       <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
          <children>
@@ -66,13 +66,13 @@
                         <TextField prefWidth="190.0" promptText="Search" GridPane.columnIndex="3" />
                      </children>
                   </GridPane>
-                  <TableView maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="30.0">
+                  <TableView fx:id="tableRssItems" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="30.0">
                     <columns>
-                      <TableColumn prefWidth="75.0" resizable="false" text="Status" />
-                      <TableColumn prefWidth="300.0" text="Title" />
-                        <TableColumn prefWidth="63.0" resizable="false" text="File" />
-                        <TableColumn prefWidth="100.0" resizable="false" text="Publication" />
-                        <TableColumn prefWidth="100.0" resizable="false" text="Downloaded" />
+                      <TableColumn fx:id="columnRssItemStatus" maxWidth="150.0" minWidth="100.0" prefWidth="75.0" text="Status" />
+                      <TableColumn fx:id="columnRssItemTitle" maxWidth="1000.0" minWidth="140.0" prefWidth="300.0" text="Title" />
+                        <TableColumn fx:id="columnRssItemFile" minWidth="100.0" prefWidth="63.0" text="File" />
+                        <TableColumn fx:id="columnRssItemPublication" prefWidth="110.0" resizable="false" text="Publication" />
+                        <TableColumn fx:id="columnRssItemDownloaded" prefWidth="110.0" resizable="false" text="Downloaded" />
                     </columns>
                      <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -153,7 +153,7 @@
                   </HBox>
                   <TableView maxHeight="250.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="30.0">
                      <columns>
-                        <TableColumn prefWidth="75.0" resizable="false" text="Status" />
+                        <TableColumn prefWidth="75.0" resizable="false" text="Active" />
                         <TableColumn prefWidth="300.0" text="Title" />
                         <TableColumn prefWidth="50.0" text="Main filter" />
                         <TableColumn prefWidth="100.0" text="Secondary filter" />

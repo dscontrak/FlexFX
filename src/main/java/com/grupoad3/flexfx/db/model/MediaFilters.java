@@ -8,10 +8,11 @@ package com.grupoad3.flexfx.db.model;
 import com.grupoad3.flexfx.db.LocalDateTimePersister;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -33,6 +34,7 @@ public class MediaFilters {
     public static final String FOLDER_PATH_FIELD_NAME = "folder_path";
     public static final String FMOD_FIELD_NAME = "fmod";
     public static final String FADD_FIELD_NAME = "fadd";
+    public static final String ACTIVE_FIELD_NAME = "active";
 
     @DatabaseField(columnName = ID_FIELD_NAME, generatedId = true)
     private Integer _id;
@@ -41,8 +43,8 @@ public class MediaFilters {
     private Integer _rssid;
     private IntegerProperty rssid;*/
     @DatabaseField(canBeNull = false, foreign = true, uniqueIndexName = "media_filters_id_rss_title_uk")
-    private Rss rss;    
-    
+    private Rss rss;
+
     @DatabaseField(columnName = TITLE_FIELD_NAME, canBeNull = false, uniqueIndexName = "media_filters_id_rss_title_uk", indexName = "rss_items_title_filter_main_idx")
     private String _title;
     private StringProperty title;
@@ -55,24 +57,28 @@ public class MediaFilters {
     @DatabaseField(columnName = CATEGORY_FIELD_NAME, width = 20)
     private MediaType _category;
     private StringProperty category;
-    
+
     @DatabaseField(columnName = FOLDER_PATH_FIELD_NAME, columnDefinition = "TEXT")
     private String _folderpath;
     private StringProperty folderpath;
-    @DatabaseField(columnName = FMOD_FIELD_NAME, persisterClass = LocalDateTimePersister.class )
+    @DatabaseField(columnName = FMOD_FIELD_NAME, persisterClass = LocalDateTimePersister.class)
     private LocalDateTime _fmod;
     private ObjectProperty<LocalDateTime> fmod;
-    @DatabaseField(columnName = FADD_FIELD_NAME, persisterClass = LocalDateTimePersister.class )
+    @DatabaseField(columnName = FADD_FIELD_NAME, persisterClass = LocalDateTimePersister.class)
     private LocalDateTime _fadd;
     private ObjectProperty<LocalDateTime> fadd;
+
+    @DatabaseField(columnName = ACTIVE_FIELD_NAME)
+    private Boolean _active;
+    private BooleanProperty active;
 
     public MediaFilters() {
         _fadd = LocalDateTime.now();
         _fmod = LocalDateTime.now();
         _category = MediaType.OTHER;
+        _active = true;
         //_deleted = false;
     }
-    
 
     public void setId(Integer id) {
         _id = id;
@@ -110,7 +116,6 @@ public class MediaFilters {
         }
         return rssid;
     }*/
-
     public void setTitle(String title) {
         _title = title;
         if (this.title != null) {
@@ -263,6 +268,28 @@ public class MediaFilters {
             fadd = new SimpleObjectProperty<>(this, "fadd", _fadd);
         }
         return fadd;
+    }
+
+    public void setActive(Boolean active) {
+        _active = active;
+        if (this.active != null) {
+            this.active.set(active);
+        }
+    }
+
+    public Boolean getActive() {
+        if (active == null) {
+            return _active;
+        } else {
+            return active.get();
+        }
+    }
+
+    public BooleanProperty activeProperty() {
+        if (active == null) {
+            active = new SimpleBooleanProperty(this, "active", _active);
+        }
+        return active;
     }
 
 }
