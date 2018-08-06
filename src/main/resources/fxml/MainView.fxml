@@ -63,7 +63,7 @@
                         </Label>
                         <CheckBox mnemonicParsing="false" text="Donwloaded" GridPane.columnIndex="2" />
                         <FontAwesomeIconView glyphName="FILTER" textAlignment="CENTER" wrappingWidth="1.0" GridPane.columnIndex="1" />
-                        <TextField prefWidth="190.0" promptText="Search" GridPane.columnIndex="3" />
+                        <TextField prefWidth="190.0" promptText="Search and press enter" GridPane.columnIndex="3" />
                      </children>
                   </GridPane>
                   <TableView fx:id="tableRssItems" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="30.0">
@@ -115,7 +115,7 @@
                         </Label>
                         <CheckBox mnemonicParsing="false" text="Active" GridPane.columnIndex="2" />
                         <FontAwesomeIconView glyphName="FILTER" textAlignment="CENTER" wrappingWidth="1.0" GridPane.columnIndex="1" />
-                        <TextField promptText="Search" GridPane.columnIndex="3" />
+                        <TextField promptText="Search and press enter" GridPane.columnIndex="3" />
                      </children>
                   </GridPane>
                   <HBox alignment="CENTER_LEFT" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
