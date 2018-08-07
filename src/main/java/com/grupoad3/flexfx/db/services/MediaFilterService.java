@@ -53,7 +53,7 @@ public class MediaFilterService extends AbstractDaoService<MediaFilters>{
         return null;
     }
     
-    public List<RssItems> getLastItemsByRss(Rss rss, long limit, long offset ){
+    public List<MediaFilters> getLastItemsByRss(Rss rss, long limit, long offset ){
         try {
             QueryBuilder builder = dao.queryBuilder();                
                 if(limit != -1l)
@@ -66,6 +66,8 @@ public class MediaFilterService extends AbstractDaoService<MediaFilters>{
                 }
                 
                 builder.where().eq(RssItems.ID_RSS_FIELD_NAME, rss.getId());
+                
+                return builder.query();
                 
         } catch (Exception e) {
             e.printStackTrace();
