@@ -6,14 +6,16 @@
 package com.grupoad3.flexfx.controller;
 
 import com.grupoad3.flexfx.MainApp;
+import com.grupoad3.flexfx.db.model.MediaFilters;
 import com.grupoad3.flexfx.db.model.Rss;
 import com.grupoad3.flexfx.db.model.RssItems;
+import com.grupoad3.flexfx.db.services.MediaFilterService;
 import com.grupoad3.flexfx.db.services.RssItemService;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -60,6 +62,22 @@ public class MainController {
 
     @FXML
     private TableColumn<RssItems, String> columnRssItemDownloaded;
+    
+    // ------ Media filter section --------------
+    @FXML
+    private TableView<MediaFilters> tableFilters;
+    
+    @FXML
+    private TableColumn<MediaFilters, String> columnFilterActive;
+    
+    @FXML
+    private TableColumn<MediaFilters, String> columnFilterTitle;
+    
+    @FXML
+    private TableColumn<MediaFilters, String> columnFilterMainFilter;
+    
+    @FXML
+    private TableColumn<MediaFilters, String> columnFilterSecondaryFilter;
 
     // Reference to the main application.
     private MainApp mainApp;
@@ -108,6 +126,7 @@ public class MainController {
             }
 
             setLastItemsByRss(rss);
+            setLastMediaFiltersByRss(rss);
 
         } else {
             lblRssTitle.setText("");
@@ -120,18 +139,20 @@ public class MainController {
     private void setLastItemsByRss(Rss rss) {
         RssItemService itemService = new RssItemService();
         List<RssItems> items = itemService.getLastItemsByRss(rss, 30, 0);
+        
+        if(items == null || items.isEmpty()){
+            return;
+        }
 
         // clear
         mainApp.getRssItemsData().clear();
 
         // add items
-        items.forEach(i -> {
-            mainApp.getRssItemsData().add(i);
-        });
+        items.forEach(i -> mainApp.getRssItemsData().add(i));
         tableRssItems.setItems(mainApp.getRssItemsData());
 
         columnRssItemTitle.setCellValueFactory(cellData -> cellData.getValue().titleProperty());
-        columnRssItemStatus.setCellValueFactory(cellData -> getStringNotNull(cellData.getValue().statusProperty()));
+        columnRssItemStatus.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
         columnRssItemFile.setCellValueFactory(cellData -> cellData.getValue().fileProperty());
         columnRssItemPublication.setCellValueFactory(cellData -> convertDateToStringProp(cellData.getValue().getDatepub()));
         columnRssItemDownloaded.setCellValueFactory(cellData -> convertDateToStringProp(cellData.getValue().getDatedown()));
@@ -146,11 +167,34 @@ public class MainController {
         return new SimpleStringProperty(dateConvert.format(formatter));
     }
 
-    private StringProperty getStringNotNull(StringProperty value) {
-        if (value == null) {
-            return new SimpleStringProperty("");
+    private SimpleStringProperty convertActivedToStringProp(BooleanProperty isActive) {
+        if (isActive == null || isActive.get() == false) {
+            return new SimpleStringProperty("INACTIVE");
         }
-        return value;
+
+        return new SimpleStringProperty("ACTIVE");
+    }
+
+    private void setLastMediaFiltersByRss(Rss rss) {
+        MediaFilterService filterService = new MediaFilterService();
+        List<MediaFilters> filters = filterService.getLastItemsByRss(rss, 20, 0);
+        
+        if(filters == null || filters.isEmpty()){
+            return;
+        }
+        
+        // clear
+        mainApp.getMediaFiltersData().clear();
+        
+        // add items
+        filters.forEach(f -> mainApp.getMediaFiltersData().add(f));
+        tableFilters.setItems(mainApp.getMediaFiltersData());
+        
+        columnFilterActive.setCellValueFactory(cellData -> convertActivedToStringProp( cellData.getValue().activeProperty()));
+        columnFilterTitle.setCellValueFactory(cellData -> cellData.getValue().titleProperty());
+        columnFilterMainFilter.setCellValueFactory(cellData -> cellData.getValue().filtermainProperty());
+        columnFilterSecondaryFilter.setCellValueFactory(cellData -> cellData.getValue().filtersecondaryProperty());
+        
     }
 
 }
