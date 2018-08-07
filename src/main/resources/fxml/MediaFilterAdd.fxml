@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane id="AnchorPane" prefHeight="290.0" prefWidth="601.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane id="AnchorPane" prefHeight="290.0" prefWidth="601.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.grupoad3.flexfx.controller.MediaFilterController">
    <children>
       <VBox prefHeight="286.0" prefWidth="601.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -66,6 +66,11 @@
                         <Insets right="20.0" />
                      </padding>
                   </Label>
+                  <ComboBox fx:id="cbxCategory" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                     <GridPane.margin>
+                        <Insets right="20.0" />
+                     </GridPane.margin>
+                  </ComboBox>
                   <Label text="Folder to download" GridPane.rowIndex="4">
                      <padding>
                         <Insets right="20.0" />
@@ -90,11 +95,6 @@
                         </RadioButton>
                      </children>
                   </HBox>
-                  <ComboBox GridPane.columnIndex="1" GridPane.rowIndex="3">
-                     <GridPane.margin>
-                        <Insets right="20.0" />
-                     </GridPane.margin>
-                  </ComboBox>
                </children>
                <padding>
                   <Insets top="10.0" />

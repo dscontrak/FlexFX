@@ -196,5 +196,15 @@ public class MainController {
         columnFilterSecondaryFilter.setCellValueFactory(cellData -> cellData.getValue().filtersecondaryProperty());
         
     }
+    
+    @FXML
+    private void handleNewMediaFilter(){
+        MediaFilters filter = new MediaFilters();
+        boolean okClicked = mainApp.showMediaFilterEditDialog(filter);
+        if(okClicked){
+            mainApp.getMediaFiltersData().add(filter);
+        }
+        
+    }
 
 }

@@ -1,6 +1,7 @@
 package com.grupoad3.flexfx;
 
 import com.grupoad3.flexfx.controller.MainController;
+import com.grupoad3.flexfx.controller.MediaFilterController;
 import com.grupoad3.flexfx.db.DatabaseUtils;
 import com.grupoad3.flexfx.db.model.MediaFilters;
 import com.grupoad3.flexfx.db.model.Rss;
@@ -20,7 +21,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class MainApp extends Application {
@@ -151,6 +154,41 @@ public class MainApp extends Application {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean showMediaFilterEditDialog(MediaFilters filter) {
+        // Load the fxml file and create a new stage for the popup dialog.
+        FXMLLoader loader = new FXMLLoader();
+        
+        try {
+            loader.setLocation(getClass().getResource("/fxml/MediaFilterAdd.fxml"));
+            AnchorPane page = (AnchorPane) loader.load();
+            
+            // Create dialog stage
+            Stage dialoStage = new Stage();
+            dialoStage.setTitle("Media Filter");
+            dialoStage.initModality(Modality.WINDOW_MODAL);
+            dialoStage.initOwner(primaryStage);
+            dialoStage.getIcons().add(iconoApp);
+            
+            // Scene
+            Scene scene = new Scene(page);
+            
+            // Set scene and controller
+            dialoStage.setScene(scene);
+            MediaFilterController controller = loader.getController();
+            controller.setDialogStage(dialoStage);
+            
+            // Show
+            dialoStage.showAndWait();
+                    
+            
+            
+        } catch (Exception e) {
+            return false;
+        }
+        
+        return true;
     }
 
 }
