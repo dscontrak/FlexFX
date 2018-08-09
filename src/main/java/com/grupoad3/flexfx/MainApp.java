@@ -156,7 +156,7 @@ public class MainApp extends Application {
         }
     }
 
-    public boolean showMediaFilterEditDialog(MediaFilters filter) {
+    public boolean showMediaFilterEditDialog(MediaFilters filter, Rss rss) {
         // Load the fxml file and create a new stage for the popup dialog.
         FXMLLoader loader = new FXMLLoader();
         
@@ -178,17 +178,19 @@ public class MainApp extends Application {
             dialoStage.setScene(scene);
             MediaFilterController controller = loader.getController();
             controller.setDialogStage(dialoStage);
+            controller.setMediaFilter(filter);
+            controller.setCurrentRss(rss);
             
             // Show
             dialoStage.showAndWait();
                     
-            
+            return controller.isSaved();
             
         } catch (Exception e) {
             return false;
         }
         
-        return true;
+        
     }
 
 }

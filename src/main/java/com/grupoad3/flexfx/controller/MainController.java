@@ -81,6 +81,7 @@ public class MainController {
 
     // Reference to the main application.
     private MainApp mainApp;
+    private Rss rssSelected;
 
     /*@Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -127,6 +128,8 @@ public class MainController {
 
             setLastItemsByRss(rss);
             setLastMediaFiltersByRss(rss);
+            
+            rssSelected = rss;
 
         } else {
             lblRssTitle.setText("");
@@ -140,12 +143,14 @@ public class MainController {
         RssItemService itemService = new RssItemService();
         List<RssItems> items = itemService.getLastItemsByRss(rss, 30, 0);
         
+        // clear
+        mainApp.getRssItemsData().clear();
+        
         if(items == null || items.isEmpty()){
             return;
         }
 
-        // clear
-        mainApp.getRssItemsData().clear();
+        
 
         // add items
         items.forEach(i -> mainApp.getRssItemsData().add(i));
@@ -179,12 +184,13 @@ public class MainController {
         MediaFilterService filterService = new MediaFilterService();
         List<MediaFilters> filters = filterService.getLastItemsByRss(rss, 20, 0);
         
+        // clear
+        mainApp.getMediaFiltersData().clear();
+        
         if(filters == null || filters.isEmpty()){
             return;
         }
         
-        // clear
-        mainApp.getMediaFiltersData().clear();
         
         // add items
         filters.forEach(f -> mainApp.getMediaFiltersData().add(f));
@@ -200,8 +206,8 @@ public class MainController {
     @FXML
     private void handleNewMediaFilter(){
         MediaFilters filter = new MediaFilters();
-        boolean okClicked = mainApp.showMediaFilterEditDialog(filter);
-        if(okClicked){
+        boolean isSaved = mainApp.showMediaFilterEditDialog(filter, rssSelected);
+        if(isSaved){
             mainApp.getMediaFiltersData().add(filter);
         }
         

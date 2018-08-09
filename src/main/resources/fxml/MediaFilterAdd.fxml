@@ -6,6 +6,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -31,12 +32,12 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label text="URL:">
+                  <Label text="Title:">
                      <padding>
                         <Insets right="20.0" />
                      </padding>
                   </Label>
-                  <TextField GridPane.columnIndex="1">
+                  <TextField fx:id="txtTitle" GridPane.columnIndex="1">
                      <GridPane.margin>
                         <Insets right="20.0" />
                      </GridPane.margin>
@@ -46,7 +47,7 @@
                         <Insets right="20.0" />
                      </padding>
                   </Label>
-                  <TextField GridPane.columnIndex="1" GridPane.rowIndex="1">
+                  <TextField fx:id="txtMainFilter" GridPane.columnIndex="1" GridPane.rowIndex="1">
                      <GridPane.margin>
                         <Insets right="20.0" />
                      </GridPane.margin>
@@ -56,7 +57,7 @@
                         <Insets right="20.0" />
                      </padding>
                   </Label>
-                  <TextField GridPane.columnIndex="1" GridPane.rowIndex="2">
+                  <TextField fx:id="txtSecFilter" GridPane.columnIndex="1" GridPane.rowIndex="2">
                      <GridPane.margin>
                         <Insets right="20.0" />
                      </GridPane.margin>
@@ -76,7 +77,7 @@
                         <Insets right="20.0" />
                      </padding>
                   </Label>
-                  <TextField GridPane.columnIndex="1" GridPane.rowIndex="4">
+                  <TextField fx:id="txtFolder" GridPane.columnIndex="1" GridPane.rowIndex="4">
                      <GridPane.margin>
                         <Insets right="20.0" />
                      </GridPane.margin>
@@ -87,8 +88,11 @@
                            <HBox.margin>
                               <Insets left="10.0" top="10.0" />
                            </HBox.margin>
+                           <toggleGroup>
+                              <ToggleGroup fx:id="groupActive" />
+                           </toggleGroup>
                         </RadioButton>
-                        <RadioButton mnemonicParsing="false" text="Inactive">
+                        <RadioButton mnemonicParsing="false" text="Inactive" toggleGroup="$groupActive">
                            <HBox.margin>
                               <Insets left="10.0" top="10.0" />
                            </HBox.margin>
@@ -116,7 +120,7 @@
                   <Insets right="10.0" />
                </HBox.margin>
             </Button>
-            <Button defaultButton="true" mnemonicParsing="false" prefWidth="80.0" text="Save">
+            <Button defaultButton="true" mnemonicParsing="false" onAction="#handleSave" prefWidth="80.0" text="Save">
                <HBox.margin>
                   <Insets right="10.0" />
                </HBox.margin>
