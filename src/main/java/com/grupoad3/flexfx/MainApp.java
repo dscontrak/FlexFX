@@ -7,6 +7,7 @@ import com.grupoad3.flexfx.db.model.MediaFilters;
 import com.grupoad3.flexfx.db.model.Rss;
 import com.grupoad3.flexfx.db.model.RssItems;
 import com.grupoad3.flexfx.db.services.RssService;
+import com.grupoad3.flexfx.ui.AlertIcon;
 import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import java.io.IOException;
@@ -49,6 +50,11 @@ public class MainApp extends Application {
     public Stage getPrimaryStage() {
         return primaryStage;
     }
+
+    public Image getIconoApp() {
+        return iconoApp;
+    }
+        
         
     @Override
     public void start(Stage stage) throws Exception {
@@ -61,10 +67,18 @@ public class MainApp extends Application {
         initDBMigration();
         initData();
         
-        showMainViewWindow();
-        
-
-        
+        showMainViewWindow();                
+    }
+    
+    /**
+     * 
+     * @param ex Set error exeption
+     */
+    public void showAlertWithEx(Exception ex){
+        AlertIcon alert = new AlertIcon(Alert.AlertType.ERROR);
+        alert.setIcon(iconoApp);
+        alert.setExeption(ex);
+        alert.showAndWait();
     }
 
     private void showMainViewWindow() {
@@ -81,11 +95,11 @@ public class MainApp extends Application {
             
             // Poniendo el controlador de la vista y poniendo la app contenedora.
             MainController controlador = loader.getController();
-            controlador.setMainApp(this);
+            controlador.setMainApp(this);                       
             
             
         } catch (IOException e) {
-            e.printStackTrace();
+            showAlertWithEx(e);
         }
 
     }
@@ -123,12 +137,7 @@ public class MainApp extends Application {
             });                                    
             
         } catch (IOException ex) {
-            Alert alerta = new Alert(Alert.AlertType.ERROR);
-            alerta.setContentText("Error:" + ex.getMessage());
-            alerta.setHeaderText(null);
-            alerta.setTitle("Error");
-                        
-            alerta.showAndWait();
+            showAlertWithEx(ex);
         }
     }
    
@@ -152,7 +161,7 @@ public class MainApp extends Application {
                 
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            showAlertWithEx(e);        
         }
     }
 
@@ -169,6 +178,8 @@ public class MainApp extends Application {
             dialoStage.setTitle("Media Filter");
             dialoStage.initModality(Modality.WINDOW_MODAL);
             dialoStage.initOwner(primaryStage);
+            
+            
             dialoStage.getIcons().add(iconoApp);
             
             // Scene
@@ -177,7 +188,7 @@ public class MainApp extends Application {
             // Set scene and controller
             dialoStage.setScene(scene);
             MediaFilterController controller = loader.getController();
-            controller.setDialogStage(dialoStage);
+            controller.setMainApp(this);
             controller.setMediaFilter(filter);
             controller.setCurrentRss(rss);
             
@@ -187,6 +198,7 @@ public class MainApp extends Application {
             return controller.isSaved();
             
         } catch (Exception e) {
+            showAlertWithEx(e);
             return false;
         }
         

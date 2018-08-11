@@ -5,14 +5,18 @@
  */
 package com.grupoad3.flexfx.controller;
 
+import com.grupoad3.flexfx.MainApp;
 import com.grupoad3.flexfx.db.model.MediaFilters;
 import com.grupoad3.flexfx.db.model.MediaType;
 import com.grupoad3.flexfx.db.model.Rss;
 import com.grupoad3.flexfx.db.services.MediaFilterService;
+import com.grupoad3.flexfx.ui.AlertIcon;
 import com.grupoad3.flexfx.util.InputValidatorHelper;
 import java.io.IOException;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
@@ -32,6 +36,8 @@ public class MediaFilterController {
     private Stage dialogStage;
     private boolean isSaved = false;
     private MediaFilters currentFilter;
+    // Reference to the main application.
+    private MainApp mainApp;
     
     @FXML
     private TextField txtTitle;
@@ -67,14 +73,19 @@ public class MediaFilterController {
         
     }
     
+    public void setMainApp(MainApp mainApp) {
+        this.mainApp = mainApp;
+        this.dialogStage = mainApp.getPrimaryStage();
+    }
+    
     /**
      * Sets the stage of this dialog.
      * 
      * @param dialogStage
      */
-    public void setDialogStage(Stage dialogStage) {
+    /*public void setDialogStage(Stage dialogStage) {
         this.dialogStage = dialogStage;
-    }
+    }*/
 
     public boolean isSaved() {
         return isSaved;
@@ -90,9 +101,11 @@ public class MediaFilterController {
     
     @FXML
     private void handleSave(){
-        MediaFilterService filterService = new MediaFilterService();
-        if(isInputValid()){
-            
+        MediaFilterService filterService;
+        InputValidatorHelper validator = isInputValid();
+        
+        if(validator.isExistError() == false){
+            filterService = new MediaFilterService();
             try {
                 currentFilter.setTitle(txtTitle.getText());
                 currentFilter.setFiltermain(txtMainFilter.getText());
@@ -110,6 +123,11 @@ public class MediaFilterController {
                 isSaved = false;
                 ex.printStackTrace();
             }
+        }else{
+            AlertIcon alert = new AlertIcon(AlertType.WARNING);                        
+            alert.setContentText(validator.getErrorFomatText());                        
+            alert.setIcon(mainApp.getIconoApp());
+            alert.showAndWait();
         }
     }
     
@@ -134,7 +152,7 @@ public class MediaFilterController {
         return false;
     }
     
-    private boolean isInputValid(){
+    private InputValidatorHelper isInputValid(){
         InputValidatorHelper validator = new InputValidatorHelper();
         if(validator.isNullOrEmpty(txtTitle.getText())){
             validator.getErrors().add("No valid Title");
@@ -154,7 +172,7 @@ public class MediaFilterController {
             validator.setExistError(true);
         }
         
-        return !validator.isExistError(); 
+        return validator; 
     }
     
 }

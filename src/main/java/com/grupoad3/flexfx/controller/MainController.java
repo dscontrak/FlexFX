@@ -17,6 +17,7 @@ import java.util.List;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -78,6 +79,15 @@ public class MainController {
     
     @FXML
     private TableColumn<MediaFilters, String> columnFilterSecondaryFilter;
+    
+    @FXML
+    private Button btnFilterAdd;
+
+    @FXML
+    private Button btnFilterDel;
+
+    @FXML
+    private Button btnFilterEdit;
 
     // Reference to the main application.
     private MainApp mainApp;
@@ -96,7 +106,7 @@ public class MainController {
         this.mainApp = mainApp;
         // Add observable list data to the table
         rssTable.setItems(mainApp.getRssData());
-
+                
     }
 
     /**
@@ -128,6 +138,7 @@ public class MainController {
 
             setLastItemsByRss(rss);
             setLastMediaFiltersByRss(rss);
+            enableControls();
             
             rssSelected = rss;
 
@@ -211,6 +222,21 @@ public class MainController {
             mainApp.getMediaFiltersData().add(filter);
         }
         
+    }
+    
+    @FXML
+    private void handleDelMediaFilter(){
+        try {
+            throw new Exception("Test error dialog");
+        } catch (Exception e) {
+            mainApp.showAlertWithEx(e);
+        }
+        
+    }
+
+    private void enableControls() {
+        btnFilterAdd.setDisable(false);
+        btnFilterDel.setDisable(false);
     }
 
 }

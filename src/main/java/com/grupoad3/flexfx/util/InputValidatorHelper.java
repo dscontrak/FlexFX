@@ -31,7 +31,17 @@ public class InputValidatorHelper {
         this.existError = existError;
     }
     
-    
+    public String getErrorFomatText(){
+        StringBuilder text = new StringBuilder();
+        text.append("Errors: \n");
+        for (String e : errors) {
+            text.append("- ")
+                .append(e)
+                .append("\n");
+        }
+        
+        return text.toString();
+    }
     
     
     

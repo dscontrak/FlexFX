@@ -17,7 +17,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="600.0" maxWidth="900.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.grupoad3.flexfx.controller.MainController">
+<BorderPane maxHeight="600.0" maxWidth="900.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.181" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.grupoad3.flexfx.controller.MainController">
    <center>
       <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
          <children>
@@ -61,9 +61,9 @@
                               <Font name="System Bold" size="14.0" />
                            </font>
                         </Label>
-                        <CheckBox mnemonicParsing="false" text="Donwloaded" GridPane.columnIndex="2" />
+                        <CheckBox disable="true" mnemonicParsing="false" text="Donwloaded" GridPane.columnIndex="2" />
                         <FontAwesomeIconView glyphName="FILTER" textAlignment="CENTER" wrappingWidth="1.0" GridPane.columnIndex="1" />
-                        <TextField prefWidth="190.0" promptText="Search and press enter" GridPane.columnIndex="3" />
+                        <TextField disable="true" prefWidth="190.0" promptText="Search and press enter" GridPane.columnIndex="3" />
                      </children>
                   </GridPane>
                   <TableView fx:id="tableRssItems" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="30.0">
@@ -80,7 +80,7 @@
                   </TableView>
                   <HBox alignment="CENTER_LEFT" maxHeight="40.0" prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="20.0">
                      <children>
-                        <Button alignment="TOP_LEFT" mnemonicParsing="false" text="Get torrent">
+                        <Button alignment="TOP_LEFT" disable="true" mnemonicParsing="false" text="Get torrent">
                            <graphic>
                               <FontAwesomeIconView glyphName="FILE" />
                            </graphic>
@@ -113,14 +113,14 @@
                               <Font name="System Bold" size="14.0" />
                            </font>
                         </Label>
-                        <CheckBox mnemonicParsing="false" text="Active" GridPane.columnIndex="2" />
+                        <CheckBox disable="true" mnemonicParsing="false" text="Active" GridPane.columnIndex="2" />
                         <FontAwesomeIconView glyphName="FILTER" textAlignment="CENTER" wrappingWidth="1.0" GridPane.columnIndex="1" />
-                        <TextField promptText="Search and press enter" GridPane.columnIndex="3" />
+                        <TextField disable="true" promptText="Search and press enter" GridPane.columnIndex="3" />
                      </children>
                   </GridPane>
                   <HBox alignment="CENTER_LEFT" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
                      <children>
-                        <Button mnemonicParsing="false" onAction="#handleNewMediaFilter">
+                        <Button fx:id="btnFilterAdd" disable="true" mnemonicParsing="false" onAction="#handleNewMediaFilter">
                            <HBox.margin>
                               <Insets bottom="5.0" right="5.0" top="5.0" />
                            </HBox.margin>
@@ -128,7 +128,7 @@
                               <FontAwesomeIconView glyphName="PLUS" />
                            </graphic>
                         </Button>
-                        <Button mnemonicParsing="false">
+                        <Button fx:id="btnFilterDel" disable="true" mnemonicParsing="false" onAction="#handleDelMediaFilter">
                            <HBox.margin>
                               <Insets bottom="5.0" right="5.0" top="5.0" />
                            </HBox.margin>
@@ -136,7 +136,7 @@
                               <FontAwesomeIconView glyphName="MINUS" />
                            </graphic>
                         </Button>
-                        <Button mnemonicParsing="false">
+                        <Button fx:id="btnFilterEdit" disable="true" mnemonicParsing="false">
                            <graphic>
                               <FontAwesomeIconView glyphName="PENCIL" />
                            </graphic>
@@ -144,7 +144,7 @@
                               <Insets bottom="5.0" right="5.0" top="5.0" />
                            </HBox.margin>
                         </Button>
-                        <Button mnemonicParsing="false">
+                        <Button disable="true" mnemonicParsing="false">
                            <graphic>
                               <FontAwesomeIconView glyphName="EXCHANGE" />
                            </graphic>
