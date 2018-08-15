@@ -16,6 +16,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -215,7 +216,7 @@ public class MainController {
     }
     
     @FXML
-    private void handleNewMediaFilter(){
+    void handleNewMediaFilter(ActionEvent event){
         MediaFilters filter = new MediaFilters();
         boolean isSaved = mainApp.showMediaFilterEditDialog(filter, rssSelected);
         if(isSaved){
@@ -225,13 +226,22 @@ public class MainController {
     }
     
     @FXML
-    private void handleDelMediaFilter(){
+    void handleDelMediaFilter(ActionEvent event){
         try {
             throw new Exception("Test error dialog");
         } catch (Exception e) {
             mainApp.showAlertWithEx(e);
         }
         
+    }
+    
+    @FXML
+    void handleRssAdd(ActionEvent event) {
+        Rss rss = new Rss();
+        boolean isSaved = mainApp.showRssEditDialog(rss);
+        if(isSaved){
+            mainApp.getRssData().add(rss);
+        }
     }
 
     private void enableControls() {

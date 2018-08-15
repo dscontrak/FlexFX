@@ -15,12 +15,10 @@ import com.grupoad3.flexfx.util.InputValidatorHelper;
 import java.io.IOException;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.stage.Stage;
 
@@ -74,9 +72,12 @@ public class MediaFilterController {
     }
     
     public void setMainApp(MainApp mainApp) {
-        this.mainApp = mainApp;
-        this.dialogStage = mainApp.getPrimaryStage();
+        this.mainApp = mainApp;        
     }
+
+    public void setDialogStage(Stage dialogStage) {
+        this.dialogStage = dialogStage;
+    }       
     
     /**
      * Sets the stage of this dialog.

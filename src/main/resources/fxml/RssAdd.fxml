@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane id="AnchorPane" prefHeight="250.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane id="AnchorPane" prefHeight="250.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.181" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.grupoad3.flexfx.controller.RssController">
    <children>
       <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -31,12 +31,12 @@
                         <Insets right="20.0" />
                      </padding>
                   </Label>
-                  <TextField GridPane.columnIndex="1" GridPane.rowIndex="1">
+                  <TextField fx:id="txtUrl" GridPane.columnIndex="1" GridPane.rowIndex="1">
                      <GridPane.margin>
                         <Insets right="20.0" />
                      </GridPane.margin>
                   </TextField>
-                  <Button defaultButton="true" mnemonicParsing="false" prefWidth="80.0" text="Get" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <Button defaultButton="true" mnemonicParsing="false" onAction="#handleGet" prefWidth="80.0" text="Get" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                </children>
             </GridPane>
             <GridPane>
@@ -60,26 +60,26 @@
                         <Insets right="20.0" />
                      </padding>
                   </Label>
-                  <Label text="Label" textFill="#6b6a6a" GridPane.columnIndex="1" />
-                  <Label text="Label" textFill="#6b6a6a" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Label fx:id="lblTitle" text="Label" textFill="#6b6a6a" GridPane.columnIndex="1" />
+                  <Label fx:id="lblUrl" text="Label" textFill="#6b6a6a" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   <Label text="Description" GridPane.rowIndex="2">
                      <padding>
                         <Insets right="20.0" />
                      </padding>
                   </Label>
-                  <Label text="Label" textFill="#6b6a6a" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <Label fx:id="lblDescription" text="Label" textFill="#6b6a6a" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                </children>
             </GridPane>
          </children>
       </VBox>
       <HBox alignment="CENTER_RIGHT" prefHeight="40.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <children>
-            <Button mnemonicParsing="false" prefWidth="80.0" text="Cancel">
+            <Button mnemonicParsing="false" onAction="#handleCancel" prefWidth="80.0" text="Cancel">
                <HBox.margin>
                   <Insets right="10.0" />
                </HBox.margin>
             </Button>
-            <Button defaultButton="true" mnemonicParsing="false" prefWidth="80.0" text="Save">
+            <Button defaultButton="true" mnemonicParsing="false" onAction="#handleSave" prefWidth="80.0" text="Save">
                <HBox.margin>
                   <Insets right="10.0" />
                </HBox.margin>

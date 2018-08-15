@@ -211,7 +211,7 @@
             </TableView>
             <HBox alignment="TOP_CENTER" maxHeight="40.0" prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0">
                <children>
-                  <Button mnemonicParsing="false">
+                  <Button mnemonicParsing="false" onAction="#handleRssAdd">
                      <HBox.margin>
                         <Insets right="5.0" top="5.0" />
                      </HBox.margin>

@@ -2,6 +2,7 @@ package com.grupoad3.flexfx;
 
 import com.grupoad3.flexfx.controller.MainController;
 import com.grupoad3.flexfx.controller.MediaFilterController;
+import com.grupoad3.flexfx.controller.RssController;
 import com.grupoad3.flexfx.db.DatabaseUtils;
 import com.grupoad3.flexfx.db.model.MediaFilters;
 import com.grupoad3.flexfx.db.model.Rss;
@@ -189,8 +190,50 @@ public class MainApp extends Application {
             dialoStage.setScene(scene);
             MediaFilterController controller = loader.getController();
             controller.setMainApp(this);
+            controller.setDialogStage(dialoStage);
             controller.setMediaFilter(filter);
             controller.setCurrentRss(rss);
+            
+            // Show
+            dialoStage.showAndWait();
+                    
+            return controller.isSaved();
+            
+        } catch (Exception e) {
+            showAlertWithEx(e);
+            return false;
+        }
+        
+        
+    }
+
+    public boolean showRssEditDialog(Rss rss) {
+        
+        // Load the fxml file and create a new stage for the popup dialog.
+        FXMLLoader loader = new FXMLLoader();
+        
+        try {
+            loader.setLocation(getClass().getResource("/fxml/RssAdd.fxml"));
+            AnchorPane page = (AnchorPane) loader.load();
+            
+            // Create dialog stage
+            Stage dialoStage = new Stage();
+            dialoStage.setTitle("Rss");
+            dialoStage.initModality(Modality.WINDOW_MODAL);
+            dialoStage.initOwner(primaryStage);            
+            
+            dialoStage.getIcons().add(iconoApp);
+            
+            // Scene
+            Scene scene = new Scene(page);
+            
+            // Set scene and controller
+            dialoStage.setScene(scene);
+            RssController controller = loader.getController();
+            controller.setMainApp(this);               
+            controller.setDialogStage(dialoStage);
+            controller.setRss(rss);
+            
             
             // Show
             dialoStage.showAndWait();
