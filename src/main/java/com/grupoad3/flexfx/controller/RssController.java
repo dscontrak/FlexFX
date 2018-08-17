@@ -8,29 +8,21 @@ package com.grupoad3.flexfx.controller;
 import com.grupoad3.flexfx.MainApp;
 import com.grupoad3.flexfx.db.model.Rss;
 import com.grupoad3.flexfx.db.services.RssService;
-import com.grupoad3.flexfx.process.WorkIndicatorDialog;
+import com.grupoad3.flexfx.process.ServiceRssTask;
 import com.grupoad3.flexfx.ui.AlertIcon;
 import com.grupoad3.flexfx.util.InputValidatorHelper;
-import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.SyndFeedInput;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import javafx.concurrent.ScheduledService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 /**
@@ -39,7 +31,9 @@ import javafx.stage.Stage;
  */
 public class RssController {
 
-    private WorkIndicatorDialog wd = null;
+    //private WorkIndicatorDialog wd = null;
+    //private RssTask rssTask;
+    ServiceRssTask serviceRssService;
 
     private Stage dialogStage;
     private boolean isSaved = false;
@@ -60,6 +54,12 @@ public class RssController {
 
     @FXML
     private Label lblDescription;
+    
+    @FXML
+    private HBox hboxProgress;
+    
+    @FXML
+    private Label lblProgress;
 
     /**
      * Initializes the controller class. This method is automatically called
@@ -69,6 +69,9 @@ public class RssController {
     private void initialize() {
         /*Object o1 = cbxCategory.getSelectionModel();
         MediaType o2 = (MediaType)cbxCategory.getValue();*/
+        //rssTask = new RssTask();
+        serviceRssService = new ServiceRssTask();
+        hboxProgress.setVisible(false);
 
     }
 
@@ -95,10 +98,8 @@ public class RssController {
 
     @FXML
     void handleGet(ActionEvent event) {
-        
-        
-        
-        try {
+
+        /*try {
             //System.out.println("Entro a handleGet");
             URL feedUrl = new URL(txtUrl.getText());
             
@@ -136,9 +137,46 @@ public class RssController {
             //System.out.println(feed);
         } catch (MalformedURLException ex) {
             mainApp.showAlertWithEx(ex);        
+        }*/
+        //lblTitle.textProperty().bind(((Task<String>) rssTask.worker).messageProperty());               
+        /*new Thread((Runnable) rssTask.worker).run();
+           
+        ((Task<String>) rssTask.worker).setOnSucceeded(evento -> {
+             System.out.println("OUT -> The task succeeded.");
+             System.out.println("VALUE -> " + evento.getSource().getValue() );
+             System.out.println("VALUE 2 -> " + rssTask.worker.getValue() );
+         });*/
+        
+        
+        
+        hboxProgress.setVisible(true);
+        //serviceRssService.setUrl("https://nyaa.si/?page=rss&u=puyero");
+        //serviceRssService.setUrl("https://anidex.info/rss/group/73");
+        serviceRssService.setUrl("https://yts.am/rss/0/720p/all/5");
+
+        if (!serviceRssService.isRunning()) {
+            serviceRssService.reset();
+            serviceRssService.start();
         }
         
+        //ExecutorService executor = Executors.newSingleThreadExecutor();
+        //Future<?> future = executor.submit()
         
+        serviceRssService.setOnFailed(evento -> {
+            //System.err.println("The task failed with the following exception:");
+            serviceRssService.getException().printStackTrace(System.err);
+            hboxProgress.setVisible(false);
+            mainApp.showAlertWithEx(serviceRssService.getException());
+        });
+
+        lblProgress.textProperty().bind(serviceRssService.messageProperty());
+
+        serviceRssService.setOnSucceeded(evento -> {
+            System.out.println("OUT -> The task succeeded.");
+            System.out.println("VALUE -> " + evento.getSource().getValue());
+            System.out.println("VALUE 2 -> " + serviceRssService.getValue());
+            hboxProgress.setVisible(false);
+        });
 
     }
 

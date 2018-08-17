@@ -321,4 +321,10 @@ public class Rss {
         return fadd;
     }
 
+    @Override
+    public String toString() {
+        return "Rss{" + "_id=" + _id + ", _title=" + _title + ", _linkrss=" + _linkrss + ", _linkweb=" + _linkweb + ", _lastsync=" + _lastsync + ", _description=" + _description + '}';
+    }
+        
+
 }

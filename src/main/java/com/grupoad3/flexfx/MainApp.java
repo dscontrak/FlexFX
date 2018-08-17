@@ -75,7 +75,7 @@ public class MainApp extends Application {
      * 
      * @param ex Set error exeption
      */
-    public void showAlertWithEx(Exception ex){
+    public void showAlertWithEx(Throwable ex){
         AlertIcon alert = new AlertIcon(Alert.AlertType.ERROR);
         alert.setIcon(iconoApp);
         alert.setExeption(ex);
