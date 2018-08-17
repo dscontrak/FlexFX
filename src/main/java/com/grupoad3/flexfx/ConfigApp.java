@@ -5,8 +5,7 @@
  */
 package com.grupoad3.flexfx;
 
-import static com.grupoad3.flexfx.ConfigApp.ConfigTypes.FOLDER_DOWLOAD;
-import static com.grupoad3.flexfx.ConfigApp.ConfigTypes.ISMIGRATED;
+import com.grupoad3.flexfx.ConfigApp.ConfigTypes;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -19,9 +18,12 @@ import java.util.Properties;
  */
 public class ConfigApp {
 
-    public enum ConfigTypes {
+    public static enum ConfigTypes {
         ISMIGRATED("app.ismigrated", "false"),
-        FOLDER_DOWLOAD("app.folder", "./downloads");
+        FOLDER_DOWLOAD("app.folder", "./downloads"),
+        PROXY_USE("app.proxy.use", "false"),
+        PROXY_HOST("app.proxy.host", "10.10.10.10"),
+        PROXY_PORT("app.proxy.port", "1000");
 
         private final String nameProperty;
         private final String valueDefault;
@@ -104,8 +106,12 @@ public class ConfigApp {
             fos = new FileOutputStream(file);
 
             // set properties
-            prop.put(ISMIGRATED.nameProp(), ISMIGRATED.defaultVal());
-            prop.put(FOLDER_DOWLOAD.nameProp(), FOLDER_DOWLOAD.defaultVal());
+            prop.put(ConfigTypes.ISMIGRATED.nameProp(), ConfigTypes.ISMIGRATED.defaultVal());
+            prop.put(ConfigTypes.FOLDER_DOWLOAD.nameProp(), ConfigTypes.FOLDER_DOWLOAD.defaultVal());
+            prop.put(ConfigTypes.PROXY_USE.nameProp(), ConfigTypes.PROXY_USE.defaultVal());
+            prop.put(ConfigTypes.PROXY_HOST.nameProp(), ConfigTypes.PROXY_HOST.defaultVal());
+            prop.put(ConfigTypes.PROXY_PORT.nameProp(), ConfigTypes.PROXY_PORT.defaultVal());            
+            
 
             // store properties to the opened file
             prop.store(fos, comments);
