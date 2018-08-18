@@ -128,7 +128,7 @@
                               <FontAwesomeIconView glyphName="PLUS" />
                            </graphic>
                         </Button>
-                        <Button fx:id="btnFilterDel" disable="true" mnemonicParsing="false" onAction="#handleDelMediaFilter">
+                        <Button fx:id="btnFilterDel" disable="true" mnemonicParsing="false" onAction="#handleMediaFilterDel">
                            <HBox.margin>
                               <Insets bottom="5.0" right="5.0" top="5.0" />
                            </HBox.margin>
@@ -201,7 +201,7 @@
                   </Button>
                </children>
             </HBox>
-            <TableView fx:id="rssTable" layoutY="43.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="50.0">
+            <TableView fx:id="tableRss" layoutY="43.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="50.0">
               <columns>
                 <TableColumn fx:id="titleRssTable" prefWidth="75.0" text="Title" />
               </columns>
@@ -219,7 +219,7 @@
                         <FontAwesomeIconView glyphName="PLUS" />
                      </graphic>
                   </Button>
-                  <Button mnemonicParsing="false">
+                  <Button mnemonicParsing="false" onAction="#handleRssDel">
                      <HBox.margin>
                         <Insets right="5.0" top="5.0" />
                      </HBox.margin>
@@ -227,7 +227,7 @@
                         <FontAwesomeIconView glyphName="MINUS" />
                      </graphic>
                   </Button>
-                  <Button mnemonicParsing="false">
+                  <Button mnemonicParsing="false" onAction="#handleRssEdit">
                      <graphic>
                         <FontAwesomeIconView glyphName="PENCIL" />
                      </graphic>

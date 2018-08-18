@@ -37,7 +37,7 @@
                         <Insets right="20.0" />
                      </GridPane.margin>
                   </TextField>
-                  <Button defaultButton="true" mnemonicParsing="false" onAction="#handleGet" prefWidth="80.0" text="Get" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <Button fx:id="btnGet" mnemonicParsing="false" onAction="#handleGet" prefWidth="80.0" text="Get" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                </children>
             </GridPane>
             <GridPane>
@@ -56,31 +56,31 @@
                         <Insets right="20.0" />
                      </padding>
                   </Label>
-                  <Label text="URL" GridPane.rowIndex="1">
+                  <Label text="Web" GridPane.rowIndex="2">
                      <padding>
                         <Insets right="20.0" />
                      </padding>
                   </Label>
-                  <Label fx:id="lblTitle" text="Label" textFill="#6b6a6a" GridPane.columnIndex="1" />
-                  <Label fx:id="lblUrl" text="Label" textFill="#6b6a6a" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <Label text="Description" GridPane.rowIndex="2">
+                  <Label text="Description" GridPane.rowIndex="1">
                      <padding>
                         <Insets right="20.0" />
                      </padding>
                   </Label>
-                  <Label fx:id="lblDescription" text="Label" textFill="#6b6a6a" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <TextField fx:id="txtTitle" disable="true" GridPane.columnIndex="1" />
+                  <TextField fx:id="txtWeb" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <TextField fx:id="txtDescription" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                </children>
             </GridPane>
          </children>
       </VBox>
       <HBox alignment="CENTER_RIGHT" prefHeight="40.0" prefWidth="218.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <children>
-            <Button mnemonicParsing="false" onAction="#handleCancel" prefWidth="80.0" text="Cancel">
+            <Button cancelButton="true" mnemonicParsing="false" onAction="#handleCancel" prefWidth="80.0" text="Cancel">
                <HBox.margin>
                   <Insets right="10.0" />
                </HBox.margin>
             </Button>
-            <Button defaultButton="true" mnemonicParsing="false" onAction="#handleSave" prefWidth="80.0" text="Save">
+            <Button fx:id="btnSave" defaultButton="true" disable="true" mnemonicParsing="false" onAction="#handleSave" prefWidth="80.0" text="Save">
                <HBox.margin>
                   <Insets right="10.0" />
                </HBox.margin>

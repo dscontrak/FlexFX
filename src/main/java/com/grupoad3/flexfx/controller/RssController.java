@@ -12,17 +12,11 @@ import com.grupoad3.flexfx.db.services.RssService;
 import com.grupoad3.flexfx.process.ServiceRssTask;
 import com.grupoad3.flexfx.ui.AlertIcon;
 import com.grupoad3.flexfx.util.InputValidatorHelper;
-
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javafx.concurrent.ScheduledService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -34,35 +28,39 @@ import javafx.stage.Stage;
  */
 public class RssController {
 
-    //private WorkIndicatorDialog wd = null;
-    //private RssTask rssTask;
     ServiceRssTask serviceRssService;
 
     private Stage dialogStage;
     private boolean isSaved = false;
-    private Rss currentRss;
+    //private Rss currentRss;
     // Reference to the main application.
     private MainApp mainApp;
 
-    private Rss rss;
+    private Rss currentRss;
 
     @FXML
     private TextField txtUrl;
 
     @FXML
-    private Label lblTitle;
+    private TextField txtTitle;
 
     @FXML
-    private Label lblUrl;
+    private TextField txtWeb;
 
     @FXML
-    private Label lblDescription;
-    
+    private TextField txtDescription;
+
     @FXML
     private HBox hboxProgress;
-    
+
     @FXML
     private Label lblProgress;
+
+    @FXML
+    private Button btnSave;
+
+     @FXML
+    private Button btnGet;
 
     /**
      * Initializes the controller class. This method is automatically called
@@ -70,9 +68,6 @@ public class RssController {
      */
     @FXML
     private void initialize() {
-        /*Object o1 = cbxCategory.getSelectionModel();
-        MediaType o2 = (MediaType)cbxCategory.getValue();*/
-        //rssTask = new RssTask();
         serviceRssService = new ServiceRssTask();
         hboxProgress.setVisible(false);
 
@@ -90,8 +85,17 @@ public class RssController {
         return isSaved;
     }
 
-    public void setRss(Rss rss) {
-        this.rss = rss;
+    public void setCurrentRss(Rss rss) {
+        this.currentRss = rss;
+        if(currentRss != null && currentRss.getId() != null && currentRss.getId() != 0){
+            txtUrl.setDisable(true);
+            btnGet.setDisable(true);
+
+            activeEdition();
+            mapToForm();
+        }else{
+            desactiveEdition();
+        }
     }
 
     @FXML
@@ -99,95 +103,76 @@ public class RssController {
         dialogStage.close();
     }
 
+    private void activeEdition(){
+        txtDescription.setDisable(false);
+        txtTitle.setDisable(false);
+        btnSave.setDisable(false);
+
+        txtTitle.requestFocus();
+
+    }
+
+    private void desactiveEdition(){
+        txtDescription.setDisable(true);
+        txtTitle.setDisable(true);
+        btnSave.setDisable(true);
+
+        txtUrl.requestFocus();
+    }
+
     @FXML
     void handleGet(ActionEvent event) {
 
+        if(txtUrl.getText().isEmpty()){
+            return;
+        }
+
         try {
-            /*try {
-            //System.out.println("Entro a handleGet");
-            URL feedUrl = new URL(txtUrl.getText());
-            
-            wd = new WorkIndicatorDialog(dialogStage.getScene().getWindow(), "Loading Rss Data...");
- 
-            wd.addTaskEndNotification(result -> {
-            System.out.println(result);
-            wd=null; // don't keep the object, cleanup
-            });
 
-            wd.exec("123", inputParam -> {
-            // Thinks to do...
-            // NO ACCESS TO UI ELEMENTS!
-            for (int i = 0; i < 2; i++) {
-            System.out.println("Loading data... '123' =->"+inputParam);
-            try {
-            Thread.sleep(1000);
-            }
-            catch (InterruptedException e) {
-            e.printStackTrace();
-            }
-            }
-            
-            try {
-            final SyndFeed feed = new SyndFeedInput().build(new InputStreamReader(feedUrl.openStream()));
-            } catch (IOException | IllegalArgumentException | FeedException ex) {
-            Logger.getLogger(RssController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
-            return new Integer(1);
-            });
-            
-            
-
-            //System.out.println(feed);
-            } catch (MalformedURLException ex) {
-            mainApp.showAlertWithEx(ex);
-            }*/
-            //lblTitle.textProperty().bind(((Task<String>) rssTask.worker).messageProperty());
-            /*new Thread((Runnable) rssTask.worker).run();
-            
-            ((Task<String>) rssTask.worker).setOnSucceeded(evento -> {
-            System.out.println("OUT -> The task succeeded.");
-            System.out.println("VALUE -> " + evento.getSource().getValue() );
-            System.out.println("VALUE 2 -> " + rssTask.worker.getValue() );
-            });*/
-            
-            
-            
             hboxProgress.setVisible(true);
-            //serviceRssService.setUrl("https://nyaa.si/?page=rss&u=puyero");
-            //serviceRssService.setUrl("https://anidex.info/rss/group/73");
-            //serviceRssService.setUrl("https://yts.am/rss/0/720p/all/5");
-            serviceRssService.setUrl(txtUrl.getText());
+
+            desactiveEdition();
+
             serviceRssService.setProxyuse(ConfigApp.readProperty(ConfigApp.ConfigTypes.PROXY_USE).equals("true"));
             serviceRssService.setProxyhost(ConfigApp.readProperty(ConfigApp.ConfigTypes.PROXY_HOST));
             serviceRssService.setProxyport(Integer.parseInt(ConfigApp.readProperty(ConfigApp.ConfigTypes.PROXY_PORT)));
-            
+
+            serviceRssService.setUrl(txtUrl.getText());
+            // if thread is not running
             if (!serviceRssService.isRunning()) {
+
+                lblProgress.textProperty().bind(serviceRssService.messageProperty());
+
+                // event fail
+                serviceRssService.setOnFailed(eventFail -> {
+                    serviceRssService.getException().printStackTrace(System.err);
+                    hboxProgress.setVisible(false);
+                    mainApp.showAlertWithEx(serviceRssService.getException());
+                });
+
+                // event success
+                serviceRssService.setOnSucceeded(eventSuccess -> {
+                    Rss r = serviceRssService.getValue();
+                    if (r != null && r.getLinkrss().isEmpty() == false) {
+                        txtTitle.setText(r.getTitle());
+                        txtWeb.setText(r.getLinkweb());
+                        txtDescription.setText(r.getDescription());
+
+                        activeEdition();
+
+                        currentRss.setLinkrss(r.getLinkrss());
+
+                    }
+
+                    hboxProgress.setVisible(false);
+
+                });
+
+                // start/reset thread
                 serviceRssService.reset();
                 serviceRssService.start();
-            }
-            
-            //ExecutorService executor = Executors.newSingleThreadExecutor();
-            //Future<?> future = executor.submit()
-            
-            serviceRssService.setOnFailed(evento -> {
-                //System.err.println("The task failed with the following exception:");
-                serviceRssService.getException().printStackTrace(System.err);
-                hboxProgress.setVisible(false);
-                mainApp.showAlertWithEx(serviceRssService.getException());
-            });
-            
-            lblProgress.textProperty().bind(serviceRssService.messageProperty());
-            
-            serviceRssService.setOnSucceeded(evento -> {                
-                Rss r = serviceRssService.getValue();
-                lblTitle.setText(r.getTitle());
-                lblUrl.setText(r.getLinkweb());
-                lblDescription.setText(r.getDescription());
-                currentRss = r;                
-                hboxProgress.setVisible(false);
-                
-            });
+            }// END: isRunning
+
         } catch (Exception ex) {
             hboxProgress.setVisible(false);
             mainApp.showAlertWithEx(ex);
@@ -199,23 +184,33 @@ public class RssController {
     void handleSave(ActionEvent event) {
         RssService rssService;
         InputValidatorHelper validator = isInputValid();
-        
-        if(currentRss != null){
+
+        if (currentRss == null) {
+            return;
+        }
+
+        if(currentRss.getLinkrss() == null){
             return;
         }
 
         if (validator.isExistError() == false) {
             rssService = new RssService();
             try {
-                currentRss.setTitle(lblTitle.getText());
+                currentRss.setTitle(txtTitle.getText());
+                currentRss.setDescription(txtDescription.getText());
+                currentRss.setLinkweb(txtWeb.getText());
 
-                rssService.create(currentRss);
+                if(currentRss.getId() == null || currentRss.getId() == 0){
+                    rssService.create(currentRss);
+                }else{
+                    rssService.update(currentRss);
+                }
 
                 isSaved = true;
                 dialogStage.close();
             } catch (IOException ex) {
                 isSaved = false;
-                ex.printStackTrace();
+                mainApp.showAlertWithEx(ex);
             }
         } else {
             AlertIcon alert = new AlertIcon(AlertType.WARNING);
@@ -225,13 +220,29 @@ public class RssController {
         }
     }
 
+
+
     private InputValidatorHelper isInputValid() {
         InputValidatorHelper validator = new InputValidatorHelper();
-        if (validator.isNullOrEmpty(lblTitle.getText())) {
+        if (validator.isNullOrEmpty(txtTitle.getText())) {
             validator.getErrors().add("No valid Title");
         }
 
+        if (validator.isNullOrEmpty(txtDescription.getText())) {
+            validator.getErrors().add("No valid Description");
+        }
+
+        if (validator.isNullOrEmpty(txtWeb.getText())) {
+            validator.getErrors().add("No valid Web");
+        }
+
         return validator;
+    }
+
+    private void mapToForm() {
+        txtTitle.setText(currentRss.getTitle());
+        txtDescription.setText(currentRss.getDescription());
+        txtWeb.setText(currentRss.getLinkweb());
     }
 
 }

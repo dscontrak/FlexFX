@@ -22,12 +22,12 @@ public class AlertIcon extends Alert{
 
     private Image icon;
     Throwable ex;
-    
-    //private 
-    
+
+    //private
+
     public AlertIcon(AlertType alertType) {
         super(alertType);
-        
+
         if(null == alertType){
             setTitle("Informmation");
         }else switch (alertType) {
@@ -42,63 +42,63 @@ public class AlertIcon extends Alert{
                 break;
             case CONFIRMATION:
                 setTitle("Confirmation");
-                break;    
+                break;
             default:
                 setTitle("Dialog Information");
                 break;
         }
-        
+
         setHeaderText(null);
-        getDialogPane().setMinWidth(700);
-        
+        getDialogPane().setMinWidth(500);
+
     }
-    
+
     public Image getIcon() {
         return icon;
     }
 
     public void setIcon(Image icon) {
         this.icon = icon;
-        
+
         if(icon != null){
             ((Stage)this.getDialogPane()
                     .getScene().getWindow())
                     .getIcons().add(icon);
-            
-            
-            
-        }        
-        
-        
+
+
+
+        }
+
+
     }
 
     public void setExeption(Throwable exeption) {
         ex = exeption;
-        
+
         if(ex == null){
             return;
-        }               
-        
+        }
+
         setTitle("Error alert");
         setHeaderText(ex.getMessage());
- 
+
         VBox dialogPaneContent = new VBox();
- 
+
         Label label = new Label("Stack Trace:");
- 
+
         String stackTrace = getStackTrace(ex);
         TextArea textArea = new TextArea();
         textArea.setText(stackTrace);
- 
+
         dialogPaneContent.getChildren().addAll(label, textArea);
- 
+
         // Set content for Dialog Pane
         getDialogPane().setContent(dialogPaneContent);
-        
-        
+
+
     }
-    
-    
+
+
     private String getStackTrace(Throwable e) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
@@ -106,8 +106,8 @@ public class AlertIcon extends Alert{
         String s = sw.toString();
         return s;
     }
-    
-    
-    
-    
+
+
+
+
 }

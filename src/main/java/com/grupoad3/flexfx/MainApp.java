@@ -232,7 +232,7 @@ public class MainApp extends Application {
             RssController controller = loader.getController();
             controller.setMainApp(this);               
             controller.setDialogStage(dialoStage);
-            controller.setRss(rss);
+            controller.setCurrentRss(rss);
             
             
             // Show

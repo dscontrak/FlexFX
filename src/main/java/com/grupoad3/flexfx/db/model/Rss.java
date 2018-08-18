@@ -77,8 +77,8 @@ public class Rss {
         _deleted = false;
     }
 
-    
-    
+
+
     public void setId(Integer id) {
         _id = id;
         if (this.id != null) {
@@ -325,6 +325,16 @@ public class Rss {
     public String toString() {
         return "Rss{" + "_id=" + _id + ", _title=" + _title + ", _linkrss=" + _linkrss + ", _linkweb=" + _linkweb + ", _lastsync=" + _lastsync + ", _description=" + _description + '}';
     }
+
+    public void copyFrom(Rss origen){
+        _title = origen.getTitle();
+        _deleted = origen.getDeleted();
+        _description = origen.getDescription();
+        _linkrss = origen.getLinkrss();
+        _linkweb = origen.getLinkweb();
+        _pubdate = origen.getPubdate();
         
+    }
+
 
 }

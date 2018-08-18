@@ -11,14 +11,20 @@ import com.grupoad3.flexfx.db.model.Rss;
 import com.grupoad3.flexfx.db.model.RssItems;
 import com.grupoad3.flexfx.db.services.MediaFilterService;
 import com.grupoad3.flexfx.db.services.RssItemService;
+import com.grupoad3.flexfx.db.services.RssService;
+import com.grupoad3.flexfx.ui.AlertIcon;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -33,7 +39,7 @@ public class MainController {
 
     // -------- Rss section --------
     @FXML
-    private TableView<Rss> rssTable;
+    private TableView<Rss> tableRss;
     @FXML
     private TableColumn<Rss, String> titleRssTable;
 
@@ -64,23 +70,23 @@ public class MainController {
 
     @FXML
     private TableColumn<RssItems, String> columnRssItemDownloaded;
-    
+
     // ------ Media filter section --------------
     @FXML
     private TableView<MediaFilters> tableFilters;
-    
+
     @FXML
     private TableColumn<MediaFilters, String> columnFilterActive;
-    
+
     @FXML
     private TableColumn<MediaFilters, String> columnFilterTitle;
-    
+
     @FXML
     private TableColumn<MediaFilters, String> columnFilterMainFilter;
-    
+
     @FXML
     private TableColumn<MediaFilters, String> columnFilterSecondaryFilter;
-    
+
     @FXML
     private Button btnFilterAdd;
 
@@ -93,6 +99,7 @@ public class MainController {
     // Reference to the main application.
     private MainApp mainApp;
     private Rss rssSelected;
+    private MediaFilters filterSelected;
 
     /*@Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -106,8 +113,8 @@ public class MainController {
     public void setMainApp(MainApp mainApp) {
         this.mainApp = mainApp;
         // Add observable list data to the table
-        rssTable.setItems(mainApp.getRssData());
-                
+        tableRss.setItems(mainApp.getRssData());
+
     }
 
     /**
@@ -122,9 +129,14 @@ public class MainController {
         // Listener to selected element of list
         showRssDetails(null);
 
-        rssTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+        tableRss.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            rssSelected = newValue;
             showRssDetails(newValue);
         });
+
+        tableFilters.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
+            filterSelected = newValue;
+        }));
 
     }
 
@@ -140,8 +152,6 @@ public class MainController {
             setLastItemsByRss(rss);
             setLastMediaFiltersByRss(rss);
             enableControls();
-            
-            rssSelected = rss;
 
         } else {
             lblRssTitle.setText("");
@@ -154,15 +164,13 @@ public class MainController {
     private void setLastItemsByRss(Rss rss) {
         RssItemService itemService = new RssItemService();
         List<RssItems> items = itemService.getLastItemsByRss(rss, 30, 0);
-        
+
         // clear
         mainApp.getRssItemsData().clear();
-        
-        if(items == null || items.isEmpty()){
+
+        if (items == null || items.isEmpty()) {
             return;
         }
-
-        
 
         // add items
         items.forEach(i -> mainApp.getRssItemsData().add(i));
@@ -195,53 +203,110 @@ public class MainController {
     private void setLastMediaFiltersByRss(Rss rss) {
         MediaFilterService filterService = new MediaFilterService();
         List<MediaFilters> filters = filterService.getLastItemsByRss(rss, 20, 0);
-        
+
         // clear
         mainApp.getMediaFiltersData().clear();
-        
-        if(filters == null || filters.isEmpty()){
+
+        if (filters == null || filters.isEmpty()) {
             return;
         }
-        
-        
+
         // add items
         filters.forEach(f -> mainApp.getMediaFiltersData().add(f));
         tableFilters.setItems(mainApp.getMediaFiltersData());
-        
-        columnFilterActive.setCellValueFactory(cellData -> convertActivedToStringProp( cellData.getValue().activeProperty()));
+
+        columnFilterActive.setCellValueFactory(cellData -> convertActivedToStringProp(cellData.getValue().activeProperty()));
         columnFilterTitle.setCellValueFactory(cellData -> cellData.getValue().titleProperty());
         columnFilterMainFilter.setCellValueFactory(cellData -> cellData.getValue().filtermainProperty());
         columnFilterSecondaryFilter.setCellValueFactory(cellData -> cellData.getValue().filtersecondaryProperty());
-        
+
     }
-    
+
     @FXML
-    void handleNewMediaFilter(ActionEvent event){
+    void handleNewMediaFilter(ActionEvent event) {
         MediaFilters filter = new MediaFilters();
         boolean isSaved = mainApp.showMediaFilterEditDialog(filter, rssSelected);
-        if(isSaved){
+        if (isSaved) {
             mainApp.getMediaFiltersData().add(filter);
         }
-        
+
     }
-    
+
     @FXML
-    void handleDelMediaFilter(ActionEvent event){
+    void handleMediaFilterDel(ActionEvent event) {
+        MediaFilterService filterService;
         try {
-            throw new Exception("Test error dialog");
-        } catch (Exception e) {
+
+            if (filterSelected == null) {
+                return;
+            }
+
+            if (isConfirmDeletion()) {
+
+                filterService = new MediaFilterService();
+                filterService.deleteById(new Long(filterSelected.getId()));
+                mainApp.getMediaFiltersData().remove(filterSelected);
+
+            }
+
+        } catch (IOException e) {
             mainApp.showAlertWithEx(e);
         }
-        
+
     }
-    
+
+    @FXML
+    void handleRssDel(ActionEvent event) {
+        RssService rssService;
+
+        try {
+
+            if (rssSelected == null) {
+                return;
+            }
+
+            if (isConfirmDeletion()) {
+
+                rssService = new RssService();
+                rssService.deleteById(new Long(rssSelected.getId()));
+                mainApp.getRssData().remove(rssSelected);
+
+            }
+
+        } catch (IOException e) {
+            mainApp.showAlertWithEx(e);
+        }
+    }
+
+    public boolean isConfirmDeletion() {
+
+        AlertIcon alert = new AlertIcon(Alert.AlertType.CONFIRMATION);
+
+        alert.setIcon(mainApp.getIconoApp());
+        alert.setContentText("Are yo want to delete this element?");
+        alert.setContentText("Confirm deletion");
+
+        Optional<ButtonType> result = alert.showAndWait();
+
+        return result.get() == ButtonType.OK;
+    }
+
     @FXML
     void handleRssAdd(ActionEvent event) {
         Rss rss = new Rss();
         boolean isSaved = mainApp.showRssEditDialog(rss);
-        if(isSaved){
+        if (isSaved) {
             mainApp.getRssData().add(rss);
         }
+    }
+
+    @FXML
+    void handleRssEdit(ActionEvent event) {
+        if (rssSelected == null) {
+            return;
+        }
+
+        mainApp.showRssEditDialog(rssSelected);
     }
 
     private void enableControls() {

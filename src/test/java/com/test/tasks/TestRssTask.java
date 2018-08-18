@@ -5,8 +5,7 @@
  */
 package com.test.tasks;
 
-import com.grupoad3.flexfx.process.RssTask;
-import javafx.concurrent.Task;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -18,11 +17,11 @@ import org.junit.Test;
  * @author daniel
  */
 public class TestRssTask {
-    
-    private RssTask rssTask;
+
+
 
     public TestRssTask() {
-        rssTask = new RssTask();
+      
     }
 
     @BeforeClass
@@ -42,12 +41,12 @@ public class TestRssTask {
     public void tearDown() {
     }
 
-    // TODO add test methods here.
+
     // The methods must be annotated with annotation @Test. For example:
     //
     @Test
     public void runTaskRss() {
-           
+
     }
 
 }

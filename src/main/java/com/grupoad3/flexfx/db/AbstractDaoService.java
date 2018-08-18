@@ -33,7 +33,7 @@ public abstract class AbstractDaoService<T> {
         try {
             this.clazz = clazz;
 
-            // TODO: let user create it's own database
+            
             /*connection = DatabaseUtils.getH2OrmliteConnectionPool(configuration.getDatabasePath(),
                     // please do not laugh :)
                     SpringConfiguration.DB_LOGIN, SpringConfiguration.DB_PASSWORD);*/
