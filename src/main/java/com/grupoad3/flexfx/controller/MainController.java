@@ -12,10 +12,15 @@ import com.grupoad3.flexfx.db.model.RssItems;
 import com.grupoad3.flexfx.db.services.MediaFilterService;
 import com.grupoad3.flexfx.db.services.RssItemService;
 import com.grupoad3.flexfx.db.services.RssService;
+import com.grupoad3.flexfx.process.ServiceRssItemsTask;
 import com.grupoad3.flexfx.ui.AlertIcon;
+import com.grupoad3.flexfx.util.ConvertionUtil;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import javafx.beans.property.BooleanProperty;
@@ -26,8 +31,10 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.layout.HBox;
 
 /**
  *
@@ -51,6 +58,12 @@ public class MainController {
 
     @FXML
     private Label lblRssLastSync;
+
+    @FXML
+    private HBox hboxProgress;
+
+    @FXML
+    private Label lblProgress;
 
     // -------- Rss item section --------
     @FXML
@@ -101,6 +114,8 @@ public class MainController {
     private Rss rssSelected;
     private MediaFilters filterSelected;
 
+    ServiceRssItemsTask serviceRssItemsService;
+
     /*@Override
     public void initialize(URL location, ResourceBundle resources) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -137,6 +152,12 @@ public class MainController {
         tableFilters.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
             filterSelected = newValue;
         }));
+
+        hboxProgress.setVisible(false);
+        serviceRssItemsService = new ServiceRssItemsTask();
+
+        mapColumnsFilters();
+        mapColumnsRssItems();
 
     }
 
@@ -176,11 +197,47 @@ public class MainController {
         items.forEach(i -> mainApp.getRssItemsData().add(i));
         tableRssItems.setItems(mainApp.getRssItemsData());
 
+        //mapColumnsRssItems();
+    }
+
+    private void mapColumnsFilters() {
+        columnFilterActive.setCellValueFactory(cellData -> convertActivedToStringProp(cellData.getValue().activeProperty()));
+        columnFilterTitle.setCellValueFactory(cellData -> cellData.getValue().titleProperty());
+        columnFilterMainFilter.setCellValueFactory(cellData -> cellData.getValue().filtermainProperty());
+        columnFilterSecondaryFilter.setCellValueFactory(cellData -> cellData.getValue().filtersecondaryProperty());
+    }
+
+    private void mapColumnsRssItems() {
         columnRssItemTitle.setCellValueFactory(cellData -> cellData.getValue().titleProperty());
         columnRssItemStatus.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
         columnRssItemFile.setCellValueFactory(cellData -> cellData.getValue().fileProperty());
         columnRssItemPublication.setCellValueFactory(cellData -> convertDateToStringProp(cellData.getValue().getDatepub()));
         columnRssItemDownloaded.setCellValueFactory(cellData -> convertDateToStringProp(cellData.getValue().getDatedown()));
+
+        columnRssItemPublication.setCellFactory(cellData -> new TableCell<RssItems, String>(){
+
+            private final SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty); //To change body of generated methods, choose Tools | Templates.
+                Date date;
+                if(empty) {
+                    setText(null);
+                }else {
+                    try {
+                        date = format.parse(item);
+                        item = ConvertionUtil.convertHumanDate(date);
+                    } catch (ParseException ex) {
+                        //ignored
+                    }
+                    this.setText(item);
+                }
+
+            }
+
+
+        });
 
     }
 
@@ -215,11 +272,7 @@ public class MainController {
         filters.forEach(f -> mainApp.getMediaFiltersData().add(f));
         tableFilters.setItems(mainApp.getMediaFiltersData());
 
-        columnFilterActive.setCellValueFactory(cellData -> convertActivedToStringProp(cellData.getValue().activeProperty()));
-        columnFilterTitle.setCellValueFactory(cellData -> cellData.getValue().titleProperty());
-        columnFilterMainFilter.setCellValueFactory(cellData -> cellData.getValue().filtermainProperty());
-        columnFilterSecondaryFilter.setCellValueFactory(cellData -> cellData.getValue().filtersecondaryProperty());
-
+        //mapColumnsFilters();
     }
 
     @FXML
@@ -307,6 +360,53 @@ public class MainController {
         }
 
         mainApp.showRssEditDialog(rssSelected);
+    }
+
+    @FXML
+    void handleRssDownload(ActionEvent event) {
+        AlertIcon alert;
+
+        if (mainApp.getMediaFiltersData() != null && mainApp.getMediaFiltersData().isEmpty()) {
+            alert = new AlertIcon(Alert.AlertType.WARNING);
+            alert.setTitle("Warning");
+            alert.setContentText("Dont you have any filter to apply with this RSS");
+            alert.setIcon(mainApp.getIconoApp());
+            alert.showAndWait();
+            return;
+        }
+        try {
+
+            if (!serviceRssItemsService.isRunning()) {
+
+                hboxProgress.setVisible(true);
+                lblProgress.textProperty().bind(serviceRssItemsService.messageProperty());
+
+                serviceRssItemsService.setRss(rssSelected);
+
+                // event fail
+                serviceRssItemsService.setOnFailed(eventFail -> {
+                    hboxProgress.setVisible(false);
+                    mainApp.showAlertWithEx(serviceRssItemsService.getException());
+                });
+
+                // event success
+                serviceRssItemsService.setOnSucceeded(eventSuccess -> {
+                    if (serviceRssItemsService.getValue() != null && serviceRssItemsService.getValue().isEmpty() == false) {
+                        hboxProgress.setVisible(false);
+                        mainApp.getRssItemsData().addAll(serviceRssItemsService.getValue());
+                        tableRssItems.setItems(mainApp.getRssItemsData());
+                    }
+                });
+
+                // start/reset thread
+                serviceRssItemsService.reset();
+                serviceRssItemsService.start();
+            }
+        } catch (Exception e) {
+            hboxProgress.setVisible(false);
+            mainApp.showAlertWithEx(e);
+        }
+
     }
 
     private void enableControls() {
