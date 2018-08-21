@@ -44,25 +44,25 @@ public class RssItems {
         _deleted = false;
         _fadd = LocalDateTime.now();
         _fmod = LocalDateTime.now();
+        changedStatus = false;
+        originRss = false;
     }
-    
-    
 
     @DatabaseField(columnName = ID_FIELD_NAME, generatedId = true)
     private Integer _id;
     private IntegerProperty id;
     /*@DatabaseField(columnName = ID_RSS_FIELD_NAME, canBeNull = false)
     private Integer _idrss;
-    private IntegerProperty idrss;*/    
-    
+    private IntegerProperty idrss;*/
+
     @DatabaseField(canBeNull = false, foreign = true)
-    private Rss rss;    
-    
+    private Rss rss;
+
     @DatabaseField(canBeNull = true, foreign = true)
-    private MediaFilters mediafilter;    
+    private MediaFilters mediafilter;
     /*private Integer _idmediafilter;
     private IntegerProperty idmediafilter;*/
-    
+
     @DatabaseField(columnName = STATUS_FIELD_NAME, canBeNull = false)
     private ItemStatus _status;
     private StringProperty status;
@@ -93,6 +93,28 @@ public class RssItems {
     @DatabaseField(columnName = DELETED_FIELD_NAME)
     private Boolean _deleted;
     private BooleanProperty deleted;
+
+    // No database property
+    private boolean changedStatus;
+    private boolean originRss;
+
+    public boolean isChangedStatus() {
+        return changedStatus;
+    }
+
+    public void setChangedStatus(boolean originBD) {
+        this.changedStatus = originBD;
+    }
+
+    public boolean isOriginRss() {
+        return originRss;
+    }
+
+    public void setOriginRss(boolean originRss) {
+        this.originRss = originRss;
+    }
+
+    
 
     public void setId(Integer id) {
         _id = id;
@@ -137,7 +159,6 @@ public class RssItems {
         }
         return idrss;
     }*/
-
     public Rss getRss() {
         return rss;
     }
@@ -153,9 +174,6 @@ public class RssItems {
     public void setMediafilter(MediaFilters mediafilter) {
         this.mediafilter = mediafilter;
     }
-    
-    
-    
 
     /*public void setIdmediafilter(Integer idmediafilter) {
         _idmediafilter = idmediafilter;
@@ -178,7 +196,6 @@ public class RssItems {
         }
         return idmediafilter;
     }*/
-
     public void setStatus(ItemStatus status) {
         _status = status;
         if (this.status != null) {
@@ -398,5 +415,12 @@ public class RssItems {
         }
         return deleted;
     }
+
+    @Override
+    public int hashCode() {
+        return this.getLink().hashCode();
+    }
+
+
 
 }

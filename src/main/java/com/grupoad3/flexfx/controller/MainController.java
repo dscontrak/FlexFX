@@ -5,6 +5,7 @@
  */
 package com.grupoad3.flexfx.controller;
 
+import com.grupoad3.flexfx.ConfigApp;
 import com.grupoad3.flexfx.MainApp;
 import com.grupoad3.flexfx.db.model.MediaFilters;
 import com.grupoad3.flexfx.db.model.Rss;
@@ -15,6 +16,7 @@ import com.grupoad3.flexfx.db.services.RssService;
 import com.grupoad3.flexfx.process.ServiceRssItemsTask;
 import com.grupoad3.flexfx.ui.AlertIcon;
 import com.grupoad3.flexfx.util.ConvertionUtil;
+import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -184,7 +186,7 @@ public class MainController {
 
     private void setLastItemsByRss(Rss rss) {
         RssItemService itemService = new RssItemService();
-        List<RssItems> items = itemService.getLastItemsByRss(rss, 30, 0);
+        List<RssItems> items = itemService.getLastItemsByRss(rss, 100, 0);
 
         // clear
         mainApp.getRssItemsData().clear();
@@ -365,6 +367,8 @@ public class MainController {
     @FXML
     void handleRssDownload(ActionEvent event) {
         AlertIcon alert;
+        String pathDir;
+        File filePath;
 
         if (mainApp.getMediaFiltersData() != null && mainApp.getMediaFiltersData().isEmpty()) {
             alert = new AlertIcon(Alert.AlertType.WARNING);
@@ -375,6 +379,13 @@ public class MainController {
             return;
         }
         try {
+            pathDir = ConfigApp.readProperty(ConfigApp.ConfigTypes.FOLDER_DOWLOAD);
+            filePath = new File(pathDir);
+            if(!filePath.exists()){
+                if(!filePath.mkdirs()){
+                    throw new Exception("Dont is possible create a folder in: \n" + filePath.getAbsolutePath());
+                }
+            }
 
             if (!serviceRssItemsService.isRunning()) {
 
@@ -382,6 +393,8 @@ public class MainController {
                 lblProgress.textProperty().bind(serviceRssItemsService.messageProperty());
 
                 serviceRssItemsService.setRss(rssSelected);
+                serviceRssItemsService.setFilters(mainApp.getMediaFiltersData());
+                serviceRssItemsService.setPath(ConfigApp.readProperty(ConfigApp.ConfigTypes.FOLDER_DOWLOAD));
 
                 // event fail
                 serviceRssItemsService.setOnFailed(eventFail -> {
@@ -393,7 +406,7 @@ public class MainController {
                 serviceRssItemsService.setOnSucceeded(eventSuccess -> {
                     if (serviceRssItemsService.getValue() != null && serviceRssItemsService.getValue().isEmpty() == false) {
                         hboxProgress.setVisible(false);
-                        mainApp.getRssItemsData().addAll(serviceRssItemsService.getValue());
+                        mainApp.getRssItemsData().setAll(serviceRssItemsService.getValue());
                         tableRssItems.setItems(mainApp.getRssItemsData());
                     }
                 });

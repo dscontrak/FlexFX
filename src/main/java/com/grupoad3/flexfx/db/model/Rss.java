@@ -333,7 +333,7 @@ public class Rss {
         _linkrss = origen.getLinkrss();
         _linkweb = origen.getLinkweb();
         _pubdate = origen.getPubdate();
-        
+
     }
 
 
