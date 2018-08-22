@@ -197,6 +197,10 @@ public class MediaFilters {
         }
     }
 
+    public MediaType getCategoryEnum() {
+        return _category;
+    }
+
     public StringProperty categoryProperty() {
         if (category == null) {
             category = new SimpleStringProperty(this, "category", _category.toString());

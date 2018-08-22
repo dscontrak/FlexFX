@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane id="AnchorPane" prefHeight="290.0" prefWidth="601.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.grupoad3.flexfx.controller.MediaFilterController">
+<AnchorPane id="AnchorPane" prefHeight="290.0" prefWidth="601.0" xmlns="http://javafx.com/javafx/8.0.181" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.grupoad3.flexfx.controller.MediaFilterController">
    <children>
       <VBox prefHeight="286.0" prefWidth="601.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -84,7 +84,7 @@
                   </TextField>
                   <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
                      <children>
-                        <RadioButton mnemonicParsing="false" text="Active">
+                        <RadioButton fx:id="rbnActive" mnemonicParsing="false" text="Active">
                            <HBox.margin>
                               <Insets left="10.0" top="10.0" />
                            </HBox.margin>
@@ -92,7 +92,7 @@
                               <ToggleGroup fx:id="groupActive" />
                            </toggleGroup>
                         </RadioButton>
-                        <RadioButton mnemonicParsing="false" text="Inactive" toggleGroup="$groupActive">
+                        <RadioButton fx:id="rbnInactive" mnemonicParsing="false" text="Inactive" toggleGroup="$groupActive">
                            <HBox.margin>
                               <Insets left="10.0" top="10.0" />
                            </HBox.margin>
@@ -115,7 +115,7 @@
       </VBox>
       <HBox alignment="CENTER_RIGHT" prefHeight="40.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <children>
-            <Button mnemonicParsing="false" prefWidth="80.0" text="Cancel">
+            <Button cancelButton="true" mnemonicParsing="false" onAction="#handleCancel" prefWidth="80.0" text="Cancel">
                <HBox.margin>
                   <Insets right="10.0" />
                </HBox.margin>

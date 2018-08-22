@@ -5,6 +5,7 @@
  */
 package com.grupoad3.flexfx.util;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -57,16 +58,28 @@ public class ConvertionUtil {
             }
         }
 
-        if (amount == 1) {
-            if (what.equals("day")) {
-                return "Yesterday";
-            } else if (what.equals("week") || what.equals("month") || what.equals("year")) {
-                return "Last " + what;
-            }
+        /*if (amount == 1) {
+        if (what.equals("day")) {
+        return "Yesterday";
+        } else if (what.equals("week") || what.equals("month") || what.equals("year")) {
+        return "Last " + what;
+        }
         } else {
-            what += "s";
+        what += "s";
+        }*/
+        switch (what) {
+            case "year":
+                return new SimpleDateFormat("d-MMM-yyyy").format(date);
+            case "week":
+            case "month":
+                return new SimpleDateFormat("d MMM',' h:mm a").format(date);
+            case "day":
+                return new SimpleDateFormat("EEE',' h:mm a").format(date);
+            case "hour":
+                return new SimpleDateFormat("h:mm a").format(date);
+            default:
+                return amount + " " + what + "s ago";
         }
 
-        return amount + " " + what + " ago";
     }
 }

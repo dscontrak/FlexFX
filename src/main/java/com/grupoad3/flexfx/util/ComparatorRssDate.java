@@ -16,7 +16,7 @@ public class ComparatorRssDate implements Comparator<RssItems>{
 
     @Override
     public int compare(RssItems o1, RssItems o2) {
-        return o1.getDatepub().compareTo(o2.getDatepub());
+        return o1.getDatepub().compareTo(o2.getDatepub()) * -1;
     }
 
 

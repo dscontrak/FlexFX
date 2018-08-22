@@ -69,11 +69,11 @@
                   </GridPane>
                   <TableView fx:id="tableRssItems" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="30.0">
                     <columns>
-                      <TableColumn fx:id="columnRssItemStatus" maxWidth="150.0" minWidth="100.0" prefWidth="75.0" text="Status" />
-                      <TableColumn fx:id="columnRssItemTitle" maxWidth="1000.0" minWidth="140.0" prefWidth="300.0" text="Title" />
-                        <TableColumn fx:id="columnRssItemFile" minWidth="100.0" prefWidth="63.0" text="File" />
-                        <TableColumn fx:id="columnRssItemPublication" prefWidth="110.0" resizable="false" text="Publication" />
-                        <TableColumn fx:id="columnRssItemDownloaded" prefWidth="110.0" resizable="false" text="Downloaded" />
+                      <TableColumn fx:id="columnRssItemStatus" maxWidth="150.0" minWidth="120.0" prefWidth="75.0" resizable="false" text="Status" />
+                        <TableColumn fx:id="columnRssItemPublication" prefWidth="120.0" resizable="false" text="Publication" />
+                      <TableColumn fx:id="columnRssItemTitle" minWidth="150.0" prefWidth="200.0" text="Title" />
+                        <TableColumn fx:id="columnRssItemDownloaded" text="Downloaded" />
+                        <TableColumn fx:id="columnRssItemFile" text="File" />
                     </columns>
                      <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -137,7 +137,7 @@
                               <FontAwesomeIconView glyphName="MINUS" />
                            </graphic>
                         </Button>
-                        <Button fx:id="btnFilterEdit" disable="true" mnemonicParsing="false">
+                        <Button fx:id="btnFilterEdit" disable="true" mnemonicParsing="false" onAction="#handleMediaFilterEdit">
                            <graphic>
                               <FontAwesomeIconView glyphName="PENCIL" />
                            </graphic>

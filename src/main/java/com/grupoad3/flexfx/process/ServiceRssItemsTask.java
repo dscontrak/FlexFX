@@ -21,6 +21,7 @@ import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
@@ -252,6 +253,7 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
                         DownloadFileHttpCilent downloadFile = new DownloadFileHttpCilent(url, path + "/" + fileName);
                         downloadFile.download();
                         item.setFile(fileName);
+                        item.setDatedown(LocalDateTime.now());
                     }
 
                     if(item.isChangedStatus() && item.isOriginRss() == false){

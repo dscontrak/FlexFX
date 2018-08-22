@@ -147,7 +147,7 @@ public class MainController {
         showRssDetails(null);
 
         tableRss.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            rssSelected = newValue;
+
             showRssDetails(newValue);
         });
 
@@ -166,6 +166,7 @@ public class MainController {
     private void showRssDetails(Rss rss) {
 
         if (rss != null) {
+            rssSelected = rss;
             lblRssTitle.setText(rss.getTitle());
             lblRssUrl.setText(rss.getLinkrss());
             if (rss.getLastsync() != null) {
@@ -179,7 +180,7 @@ public class MainController {
         } else {
             lblRssTitle.setText("");
             lblRssUrl.setText("");
-            lblRssLastSync.setText("");
+            lblRssLastSync.setText("Unsynchronized");
 
         }
     }
@@ -288,6 +289,21 @@ public class MainController {
     }
 
     @FXML
+    void handleMediaFilterEdit(ActionEvent event) {
+        MediaFilters filter = filterSelected;
+
+        if(filterSelected == null){
+            return;
+        }
+
+        boolean isSaved = mainApp.showMediaFilterEditDialog(filter, rssSelected);
+        if (isSaved) {
+            mainApp.getMediaFiltersData().remove(filter);
+            mainApp.getMediaFiltersData().add(filter);
+        }
+    }
+
+    @FXML
     void handleMediaFilterDel(ActionEvent event) {
         MediaFilterService filterService;
         try {
@@ -370,6 +386,7 @@ public class MainController {
         String pathDir;
         File filePath;
 
+
         if (mainApp.getMediaFiltersData() != null && mainApp.getMediaFiltersData().isEmpty()) {
             alert = new AlertIcon(Alert.AlertType.WARNING);
             alert.setTitle("Warning");
@@ -408,6 +425,17 @@ public class MainController {
                         hboxProgress.setVisible(false);
                         mainApp.getRssItemsData().setAll(serviceRssItemsService.getValue());
                         tableRssItems.setItems(mainApp.getRssItemsData());
+
+
+
+                        try {
+                            RssService rssService = new RssService();
+                            rssSelected.setLastsync(LocalDateTime.now());
+                            lblRssLastSync.setText(rssSelected.getLastsync().toString());
+                            rssService.update(rssSelected);
+                        } catch (IOException ex) {
+                            mainApp.showAlertWithEx(ex);
+                        }
                     }
                 });
 
@@ -425,6 +453,7 @@ public class MainController {
     private void enableControls() {
         btnFilterAdd.setDisable(false);
         btnFilterDel.setDisable(false);
+        btnFilterEdit.setDisable(false);
     }
 
 }
