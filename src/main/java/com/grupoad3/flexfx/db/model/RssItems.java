@@ -44,7 +44,7 @@ public class RssItems {
         _deleted = false;
         _fadd = LocalDateTime.now();
         _fmod = LocalDateTime.now();
-        changedStatus = false;
+        downloadNow = false;
         originRss = false;
     }
 
@@ -95,15 +95,24 @@ public class RssItems {
     private BooleanProperty deleted;
 
     // No database property
-    private boolean changedStatus;
+    private boolean downloadNow;
     private boolean originRss;
+    private boolean applyMainFilter;
 
-    public boolean isChangedStatus() {
-        return changedStatus;
+    public boolean isApplyMainFilter() {
+        return applyMainFilter;
     }
 
-    public void setChangedStatus(boolean originBD) {
-        this.changedStatus = originBD;
+    public void setApplyMainFilter(boolean applyMainFilter) {
+        this.applyMainFilter = applyMainFilter;
+    }
+
+    public boolean isDonwloadNow() {
+        return downloadNow;
+    }
+
+    public void setDonwloadNow(boolean originBD) {
+        this.downloadNow = originBD;
     }
 
     public boolean isOriginRss() {
@@ -113,8 +122,6 @@ public class RssItems {
     public void setOriginRss(boolean originRss) {
         this.originRss = originRss;
     }
-
-    
 
     public void setId(Integer id) {
         _id = id;
@@ -421,6 +428,16 @@ public class RssItems {
         return this.getLink().hashCode();
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
 
+        if (obj == this) {
+            return true;
+        }
+        return this.getLink().equals( ((RssItems) obj).getLink() );
+    }
 
 }

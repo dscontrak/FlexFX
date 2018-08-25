@@ -23,8 +23,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -45,6 +48,9 @@ import org.apache.http.impl.client.HttpClientBuilder;
  */
 public class ServiceRssItemsTask extends Service<List<RssItems>> {
 
+    final String errorStatus = ItemStatus.ERROR.toString();
+    final String downStatus = ItemStatus.DOWNLOADED.toString();
+
     private final BooleanProperty proxyuse = new SimpleBooleanProperty(this, "proxyuse", false);
     private final IntegerProperty proxyport = new SimpleIntegerProperty(this, "proxyport");
     private final StringProperty proxyhost = new SimpleStringProperty(this, "proxyhost");
@@ -64,7 +70,6 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
     public void setPath(String path) {
         this.path = path;
     }
-
 
     public final void setProxyuse(Boolean value) {
         proxyuse.set(value);
@@ -106,14 +111,15 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
                     return null;
                 }
 
-                if(_path == null || _path.isEmpty()){
+                if (_path == null || _path.isEmpty()) {
                     updateMessage("Path is empty");
                     Thread.sleep(2000);
                     return null;
                 }
 
                 // Data and rss
-                TreeSet<RssItems> items = new TreeSet<>(new ComparatorRssDate());
+                HashSet<RssItems> itemsAll = new HashSet<>();
+                TreeSet<RssItems> itemsToAdd = new TreeSet<>(new ComparatorRssDate());
                 String proxyHost;
                 Integer proxyPort;
                 HttpHost proxyHostObject = null;
@@ -139,8 +145,6 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
 
                 try {
 
-
-
                     // Get data from RSS reading
                     HttpResponse response = client.execute(getRequest);
 
@@ -158,7 +162,7 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
                     itemService = new RssItemService();
                     lastItems = itemService.getLastItemsByRss(_rss, feed.getEntries().size(), 0);
                     lastItems.forEach(i -> {
-                        items.add(i);
+                        itemsAll.add(i);
                     });
 
                     // Add rss from rss reading
@@ -181,21 +185,28 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
                             item.setStatus(ItemStatus.IGNORED);
                         }
 
-                        items.add(item);
+                        itemsAll.add(item);
 
                     }
-
 
                     int indexItem = 1;
                     // Analize data wiht local and remote data
-                    for (RssItems itemToAnalize : items) {
-                        updateMessage("Analyzing " + indexItem + "/" + items.size());
+                    for (RssItems itemToAnalize : itemsAll) {
+
+                        updateMessage("Analyzing " + indexItem + "/" + itemsAll.size());
                         indexItem++;
                         //updateMessage(_path);
-                        anlyzeRssItem(itemService, itemToAnalize, _filters);
+                        if (anlyzeRssItem(itemToAnalize, _filters) != null) {
+                            itemsToAdd.add(itemToAnalize);
+                        }
                     }
 
-
+                    indexItem = 1;
+                    for (RssItems itemToAnalize : itemsToAdd) {
+                        updateMessage("Downloading/Save " + indexItem + "/" + itemsToAdd.size());
+                        indexItem++;
+                        downloadAndSave(itemToAnalize, itemService);
+                    }
                     updateMessage("Terminated... ");
                     Thread.sleep(700);
 
@@ -203,27 +214,56 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
                     e.printStackTrace();
                 }
 
-                return new ArrayList<>(items);
+                return new ArrayList<>(itemsToAdd);
             }
 
-            private void anlyzeRssItem(RssItemService db, RssItems item, List<MediaFilters> _filters)  {
+            private void downloadAndSave(RssItems itemToAnalize, RssItemService db) {
+                if (itemToAnalize.isDonwloadNow()) {
 
+                    if (itemToAnalize.getStatus().equals(downStatus) && itemToAnalize.isDonwloadNow()) {
+                        String url = itemToAnalize.getLink();
+                        String fileName = url.substring(url.lastIndexOf('/') + 1, url.length());
 
-                String url = item.getLink();
-                String fileName = url.substring( url.lastIndexOf('/')+1, url.length() );
-                //String fileNameWithoutExtn = fileName.substring(0, fileName.lastIndexOf('.'));
+                        DownloadFileHttpCilent downloadFile = new DownloadFileHttpCilent(url, path + "/" + fileName);
+                        try {
+                            downloadFile.download();
+                        } catch (IOException ex) {
+                            Logger.getLogger(ServiceRssItemsTask.class.getName()).log(Level.SEVERE, null, ex);
+                            itemToAnalize.setStatus(ItemStatus.ERROR);
+                        }
+                        itemToAnalize.setFile(fileName);
+                        itemToAnalize.setDatedown(LocalDateTime.now());
+                    }
+
+                }
 
                 try {
-                    String errorStatus = ItemStatus.ERROR.toString();
-                    String downStatus = ItemStatus.DOWNLOADED.toString();
+                    if (itemToAnalize.isDonwloadNow() && itemToAnalize.isOriginRss() == false) {
+                        db.update(itemToAnalize);
+                    } else if (itemToAnalize.isOriginRss()) {
+                        db.create(itemToAnalize);
+                    }
+
+                } catch (IOException ex) {
+                    Logger.getLogger(ServiceRssItemsTask.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+            private RssItems anlyzeRssItem(RssItems item, List<MediaFilters> _filters) {
+
+                //String url = item.getLink();
+                //String fileName = url.substring( url.lastIndexOf('/')+1, url.length() );
+                //String fileNameWithoutExtn = fileName.substring(0, fileName.lastIndexOf('.'));
+                try {
+
                     // With error
                     if (item.getStatus().equals(errorStatus)) {
-                        db.create(item);
-                        return;
+                        //db.create(item);
+                        return item;
                     }
                     // Is downloaded from DATABASE
-                    if(item.getStatus().equals(downStatus)){
-                        return;
+                    if (item.getStatus().equals(downStatus)) {
+                        return item;
                     }
 
                     _filters.forEach(filter -> {
@@ -232,44 +272,38 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
 
                         if (filter.getFiltermain().isEmpty()) {
                             return; // Continue
-                        }else if(CompareUtil.containsIgnoreCase(item.getTitle(), filter.getFiltermain())){
+                        } else if (CompareUtil.containsIgnoreCase(item.getTitle(), filter.getFiltermain())) {
                             applyMainFilter = true;
                         }
 
                         if (filter.getFiltersecondary().isEmpty()) {
                             applySecondaryFilter = true;
-                        }else if(CompareUtil.containsIgnoreCase(item.getTitle(), filter.getFiltersecondary())){
+                        } else if (CompareUtil.containsIgnoreCase(item.getTitle(), filter.getFiltersecondary())) {
                             applySecondaryFilter = true;
                         }
 
-                        if(applyMainFilter && applySecondaryFilter){
-                            item.setChangedStatus(true);
+                        if (applyMainFilter && applySecondaryFilter) {
+                            item.setDonwloadNow(true);
                             item.setStatus(ItemStatus.DOWNLOADED);
+                        }
+                        item.setApplyMainFilter(applyMainFilter);
+
+                        if(item.isApplyMainFilter()){
+                            item.setMediafilter(filter);
                         }
 
                     });
 
-                    if(item.getStatus().equals(downStatus)){
-                        DownloadFileHttpCilent downloadFile = new DownloadFileHttpCilent(url, path + "/" + fileName);
-                        downloadFile.download();
-                        item.setFile(fileName);
-                        item.setDatedown(LocalDateTime.now());
-                    }
-
-                    if(item.isChangedStatus() && item.isOriginRss() == false){
-                        db.update(item);
-                    }else if(item.isOriginRss()){
-                        db.create(item);
-                    }
-
                 } catch (Exception e) {
-                    try {
-                        item.setStatus(ItemStatus.ERROR);
-                        db.create(item);
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
+                    item.setStatus(ItemStatus.ERROR);
+                    //db.create(item);
                     e.printStackTrace();
+                }
+
+                if (item.isApplyMainFilter()) {
+                    return item;
+                } else {
+                    return null;
                 }
 
             }

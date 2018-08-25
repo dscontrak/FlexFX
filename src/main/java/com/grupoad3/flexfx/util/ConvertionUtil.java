@@ -46,13 +46,13 @@ public class ConvertionUtil {
             what = "day";
         } else if (diff > 3600) {
             amount = (int) (diff / 3600);
-            what = "hour";
+            what = "hr";
         } else if (diff > 60) {
             amount = (int) (diff / 60);
-            what = "minute";
+            what = "min";
         } else {
             amount = (int) diff;
-            what = "second";
+            what = "sec";
             if (amount < 6) {
                 return "Just now";
             }
@@ -75,7 +75,7 @@ public class ConvertionUtil {
                 return new SimpleDateFormat("d MMM',' h:mm a").format(date);
             case "day":
                 return new SimpleDateFormat("EEE',' h:mm a").format(date);
-            case "hour":
+            case "hr":
                 return new SimpleDateFormat("h:mm a").format(date);
             default:
                 return amount + " " + what + "s ago";

@@ -44,7 +44,8 @@ import javafx.scene.layout.HBox;
  */
 public class MainController {
 
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm");
+    private final String PATTERN_DATE = "yyyy/MM/dd HH:mm:ss";
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(PATTERN_DATE);
 
     // -------- Rss section --------
     @FXML
@@ -110,6 +111,16 @@ public class MainController {
 
     @FXML
     private Button btnFilterEdit;
+
+    // TODO: * Agregar la configuración principal y también de la útlima syncronización con la fecha convertida
+    // TODO: * Poner en gris los que estan en ignorado o error.
+    // TODO: Activar la busqueda de lo descargado y activado/descargado checkbox
+    // TODO: Agregar funcionalidad con qBittorrent y Transmission/Deluge solo para agregar basarse en: tympanix / Electorrent
+
+    // ---- Future
+    // TODO: Poner el proceso de carga debajo del boton de descarga
+    // TODO: Poner la funcionalidad del media filter con los archivos descargdos relacionados
+    // TODO: Obtener información de API de algun lado del titulo
 
     // Reference to the main application.
     private MainApp mainApp;
@@ -215,11 +226,13 @@ public class MainController {
         columnRssItemStatus.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
         columnRssItemFile.setCellValueFactory(cellData -> cellData.getValue().fileProperty());
         columnRssItemPublication.setCellValueFactory(cellData -> convertDateToStringProp(cellData.getValue().getDatepub()));
+
+
         columnRssItemDownloaded.setCellValueFactory(cellData -> convertDateToStringProp(cellData.getValue().getDatedown()));
 
         columnRssItemPublication.setCellFactory(cellData -> new TableCell<RssItems, String>(){
 
-            private final SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+            private final SimpleDateFormat format = new SimpleDateFormat(PATTERN_DATE);
 
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -236,9 +249,29 @@ public class MainController {
                     }
                     this.setText(item);
                 }
-
             }
 
+        });
+        columnRssItemDownloaded.setCellFactory(cellData -> new TableCell<RssItems, String>(){
+
+            private final SimpleDateFormat format = new SimpleDateFormat(PATTERN_DATE);
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty); //To change body of generated methods, choose Tools | Templates.
+                Date date;
+                if(empty) {
+                    setText(null);
+                }else {
+                    try {
+                        date = format.parse(item);
+                        item = ConvertionUtil.convertHumanDate(date);
+                    } catch (ParseException ex) {
+                        //ignored
+                    }
+                    this.setText(item);
+                }
+            }
 
         });
 
@@ -329,7 +362,7 @@ public class MainController {
     @FXML
     void handleRssDel(ActionEvent event) {
         RssService rssService;
-
+        // TODO: Agregar para eliminar todo lo dependiente
         try {
 
             if (rssSelected == null) {
@@ -422,11 +455,8 @@ public class MainController {
                 // event success
                 serviceRssItemsService.setOnSucceeded(eventSuccess -> {
                     if (serviceRssItemsService.getValue() != null && serviceRssItemsService.getValue().isEmpty() == false) {
-                        hboxProgress.setVisible(false);
                         mainApp.getRssItemsData().setAll(serviceRssItemsService.getValue());
                         tableRssItems.setItems(mainApp.getRssItemsData());
-
-
 
                         try {
                             RssService rssService = new RssService();
@@ -437,6 +467,7 @@ public class MainController {
                             mainApp.showAlertWithEx(ex);
                         }
                     }
+                    hboxProgress.setVisible(false);
                 });
 
                 // start/reset thread

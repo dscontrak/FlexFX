@@ -62,6 +62,8 @@ public class MediaFilterController {
     @FXML
     private RadioButton rbnInactive;
 
+    //TODO: * Agregar lo que no debe contener
+
     private Rss rss;
 
     /**
@@ -102,7 +104,7 @@ public class MediaFilterController {
     public void setMediaFilter(MediaFilters filter) {
         currentFilter = filter;
 
-        if(currentFilter != null && currentFilter.getId() != 0){
+        if(currentFilter != null && currentFilter.getId() != null && currentFilter.getId() != 0){
             txtFolder.setText(currentFilter.getFolderpath());
             txtMainFilter.setText(currentFilter.getFiltermain());
             txtSecFilter.setText(currentFilter.getFiltersecondary());
@@ -149,6 +151,7 @@ public class MediaFilterController {
             } catch (IOException ex) {
                 isSaved = false;
                 ex.printStackTrace();
+                mainApp.showAlertWithEx(ex);
             }
         }else{
             AlertIcon alert = new AlertIcon(AlertType.WARNING);
