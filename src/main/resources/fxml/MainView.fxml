@@ -190,7 +190,7 @@
                         <Font size="14.0" />
                      </font>
                   </Button>
-                  <Button mnemonicParsing="false">
+                  <Button mnemonicParsing="false" onAction="#handleConfig">
                      <graphic>
                         <FontAwesomeIconView glyphName="COG" size="12" />
                      </graphic>

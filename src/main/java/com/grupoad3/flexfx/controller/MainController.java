@@ -318,7 +318,15 @@ public class MainController {
 
         //mapColumnsFilters();
     }
-
+    
+    @FXML
+    void handleConfig(ActionEvent event) {
+        boolean isSaved = mainApp.showConfigDialog();
+        if(isSaved){
+            System.out.println("Is saved");
+        }
+    }
+    
     @FXML
     void handleMediaFilterAdd(ActionEvent event) {
         MediaFilters filter = new MediaFilters();

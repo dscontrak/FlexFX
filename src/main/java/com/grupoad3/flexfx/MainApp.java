@@ -1,5 +1,6 @@
 package com.grupoad3.flexfx;
 
+import com.grupoad3.flexfx.controller.ConfigController;
 import com.grupoad3.flexfx.controller.MainController;
 import com.grupoad3.flexfx.controller.MediaFilterController;
 import com.grupoad3.flexfx.controller.RssController;
@@ -246,6 +247,39 @@ public class MainApp extends Application {
         }
         
         
+    }
+
+    public boolean showConfigDialog() {
+         // Load the fxml file and create a new stage for the popup dialog.
+        FXMLLoader loader = new FXMLLoader();
+        try {
+            loader.setLocation(getClass().getResource("/fxml/ConfigView.fxml"));
+            AnchorPane page = (AnchorPane) loader.load();
+            
+            // Create dialog stage
+            Stage dialoStage = new Stage();
+            dialoStage.setTitle("Config");
+            dialoStage.initModality(Modality.WINDOW_MODAL);
+            dialoStage.initOwner(primaryStage);            
+            
+            dialoStage.getIcons().add(iconoApp);
+            
+            // Scene
+            Scene scene = new Scene(page);
+            
+            // Set scene and controller
+            dialoStage.setScene(scene);
+            ConfigController controller = loader.getController();    
+            
+             // Show
+            dialoStage.showAndWait();
+            
+            return controller.isSaved();
+            
+        } catch (Exception e) {
+            showAlertWithEx(e);
+            return false;
+        }
     }
 
 }
