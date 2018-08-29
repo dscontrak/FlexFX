@@ -18,7 +18,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="600.0" maxWidth="900.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.181" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.grupoad3.flexfx.controller.MainController">
+<BorderPane maxHeight="600.0" maxWidth="900.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.grupoad3.flexfx.controller.MainController">
    <center>
       <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
          <children>
@@ -121,7 +121,7 @@
                   </GridPane>
                   <HBox alignment="CENTER_LEFT" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
                      <children>
-                        <Button fx:id="btnFilterAdd" disable="true" mnemonicParsing="false" onAction="#handleNewMediaFilter">
+                        <Button fx:id="btnFilterAdd" disable="true" mnemonicParsing="false" onAction="#handleMediaFilterAdd">
                            <HBox.margin>
                               <Insets bottom="5.0" right="5.0" top="5.0" />
                            </HBox.margin>
@@ -158,6 +158,7 @@
                         <TableColumn fx:id="columnFilterTitle" prefWidth="300.0" text="Title" />
                         <TableColumn fx:id="columnFilterMainFilter" prefWidth="50.0" text="Main filter" />
                         <TableColumn fx:id="columnFilterSecondaryFilter" prefWidth="100.0" text="Secondary filter" />
+                        <TableColumn fx:id="columnFilterIgnore" prefWidth="100.0" text="Ignore filter" />
                      </columns>
                      <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

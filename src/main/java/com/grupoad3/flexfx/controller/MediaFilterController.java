@@ -46,6 +46,9 @@ public class MediaFilterController {
 
     @FXML
     private TextField txtSecFilter;
+    
+     @FXML
+    private TextField txtIgnoreFilter;
 
     @FXML
     private ComboBox<MediaType> cbxCategory;
@@ -108,12 +111,13 @@ public class MediaFilterController {
             txtFolder.setText(currentFilter.getFolderpath());
             txtMainFilter.setText(currentFilter.getFiltermain());
             txtSecFilter.setText(currentFilter.getFiltersecondary());
+            txtIgnoreFilter.setText(currentFilter.getFilterignore());
             txtTitle.setText(currentFilter.getTitle());
             cbxCategory.setValue(currentFilter.getCategoryEnum());
             if(filter.getActive()){
                 rbnActive.setSelected(true);
             }else{
-                rbnActive.setSelected(false);
+                rbnInactive.setSelected(true);
             }
         }
 
@@ -134,6 +138,7 @@ public class MediaFilterController {
                 currentFilter.setTitle(txtTitle.getText());
                 currentFilter.setFiltermain(txtMainFilter.getText());
                 currentFilter.setFiltersecondary(txtSecFilter.getText());
+                currentFilter.setFilterignore(txtIgnoreFilter.getText());
                 currentFilter.setRss(rss);
                 currentFilter.setCategory(cbxCategory.getValue());
                 currentFilter.setFolderpath(txtFolder.getText());

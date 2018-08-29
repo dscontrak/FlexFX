@@ -102,6 +102,9 @@ public class MainController {
 
     @FXML
     private TableColumn<MediaFilters, String> columnFilterSecondaryFilter;
+    
+    @FXML
+    private TableColumn<MediaFilters, String> columnFilterIgnore;
 
     @FXML
     private Button btnFilterAdd;
@@ -111,11 +114,14 @@ public class MainController {
 
     @FXML
     private Button btnFilterEdit;
-
-    // TODO: * Agregar la configuración principal y también de la útlima syncronización con la fecha convertida
-    // TODO: * Poner en gris los que estan en ignorado o error.
+    
+    
+    // TODO: * Agregar la configuración principal y también de la útlima syncronización con la fecha convertida, `filter_ignore` VARCHAR
+    // TODO: * Poner en el algoritmo el ignorado
     // TODO: Activar la busqueda de lo descargado y activado/descargado checkbox
+    // TODO: Poner en gris los que estan en ignorado o error.    
     // TODO: Agregar funcionalidad con qBittorrent y Transmission/Deluge solo para agregar basarse en: tympanix / Electorrent
+    // TODO: Agregar tooltip y acceso directo por el teclado
 
     // ---- Future
     // TODO: Poner el proceso de carga debajo del boton de descarga
@@ -140,8 +146,10 @@ public class MainController {
      */
     public void setMainApp(MainApp mainApp) {
         this.mainApp = mainApp;
-        // Add observable list data to the table
+        // Add observable list data to the table and bindings
         tableRss.setItems(mainApp.getRssData());
+        tableFilters.setItems(mainApp.getMediaFiltersData());
+        tableRssItems.setItems(mainApp.getRssItemsData());
 
     }
 
@@ -158,7 +166,6 @@ public class MainController {
         showRssDetails(null);
 
         tableRss.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-
             showRssDetails(newValue);
         });
 
@@ -219,6 +226,7 @@ public class MainController {
         columnFilterTitle.setCellValueFactory(cellData -> cellData.getValue().titleProperty());
         columnFilterMainFilter.setCellValueFactory(cellData -> cellData.getValue().filtermainProperty());
         columnFilterSecondaryFilter.setCellValueFactory(cellData -> cellData.getValue().filtersecondaryProperty());
+        columnFilterIgnore.setCellValueFactory(cellData -> cellData.getValue().filterignoreProperty());
     }
 
     private void mapColumnsRssItems() {
@@ -306,13 +314,13 @@ public class MainController {
 
         // add items
         filters.forEach(f -> mainApp.getMediaFiltersData().add(f));
-        tableFilters.setItems(mainApp.getMediaFiltersData());
+        
 
         //mapColumnsFilters();
     }
 
     @FXML
-    void handleNewMediaFilter(ActionEvent event) {
+    void handleMediaFilterAdd(ActionEvent event) {
         MediaFilters filter = new MediaFilters();
         boolean isSaved = mainApp.showMediaFilterEditDialog(filter, rssSelected);
         if (isSaved) {

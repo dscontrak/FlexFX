@@ -30,6 +30,7 @@ public class MediaFilters {
     public static final String TITLE_FIELD_NAME = "title";
     public static final String FILTER_MAIN_FIELD_NAME = "filter_main";
     public static final String FILTER_SECONDARY_FIELD_NAME = "filter_secondary";
+    public static final String FILTER_IGNORE_FIELD_NAME = "filter_ignore";
     public static final String CATEGORY_FIELD_NAME = "category";
     public static final String FOLDER_PATH_FIELD_NAME = "folder_path";
     public static final String FMOD_FIELD_NAME = "fmod";
@@ -54,6 +55,10 @@ public class MediaFilters {
     @DatabaseField(columnName = FILTER_SECONDARY_FIELD_NAME)
     private String _filtersecondary;
     private StringProperty filtersecondary;
+    @DatabaseField(columnName = FILTER_IGNORE_FIELD_NAME)
+    private String _filterignore;
+    private StringProperty filterignore;
+
     @DatabaseField(columnName = CATEGORY_FIELD_NAME, width = 20)
     private MediaType _category;
     private StringProperty category;
@@ -180,6 +185,28 @@ public class MediaFilters {
             filtersecondary = new SimpleStringProperty(this, "filtersecondary", _filtersecondary);
         }
         return filtersecondary;
+    }
+
+    public void setFilterignore(String filterignore) {
+        _filterignore = filterignore;
+        if (this.filterignore != null) {
+            this.filterignore.set(filterignore);
+        }
+    }
+
+    public String getFilterignore() {
+        if (filterignore == null) {
+            return _filterignore;
+        } else {
+            return filterignore.get();
+        }
+    }
+
+    public StringProperty filterignoreProperty() {
+        if (filterignore == null) {
+            filterignore = new SimpleStringProperty(this, "filterignore", _filterignore);
+        }
+        return filterignore;
     }
 
     public void setCategory(MediaType category) {
