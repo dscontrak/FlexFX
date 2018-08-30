@@ -10,7 +10,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  *
@@ -20,10 +24,20 @@ public class ConfigApp {
 
     public static enum ConfigTypes {
         ISMIGRATED("app.ismigrated", "false"),
-        FOLDER_DOWLOAD("app.folder", "./downloads"),
+        
+        FOLDER_DOWNLOAD("app.folder", "./downloads"),
+        
         PROXY_USE("app.proxy.use", "false"),
         PROXY_HOST("app.proxy.host", "10.10.10.10"),
-        PROXY_PORT("app.proxy.port", "1000");
+        PROXY_PORT("app.proxy.port", "1000"),
+        
+        CLIENTTORR_USE("torrent.client.host", "false"),
+        CLIENTTORR_HOST("torrent.client.host", "127.0.0.1"),
+        CLIENTTORR_PORT("torrent.client.port", "80"),
+        CLIENTTORR_USER("torrent.client.user", "user"),
+        CLIENTTORR_PASS("torrent.client.pass", "pass"),
+        CLIENTTORR_APP("torrent.client.app", "QBITTORRENT")
+        ;
 
         private final String nameProperty;
         private final String valueDefault;
@@ -87,6 +101,20 @@ public class ConfigApp {
             throw new Exception("Dont found config value with key: " + key);
         }
     }
+    
+    public static Map<String,String> readAllProperties() throws Exception {        
+        Map<String,String> valuesProperties = new HashMap<>();
+
+        if (isLoadedProperies == false) {
+            throw new Exception("Properties is not loaded");
+        }
+
+        for (ConfigTypes value : ConfigTypes.values()) {
+                valuesProperties.put(value.nameProp(), properties.getProperty(value.nameProp()));
+        } 
+        
+        return valuesProperties;
+    }
 
     public boolean isCreatedNewFile() {
         return isCreatedNewFile;
@@ -106,13 +134,48 @@ public class ConfigApp {
             fos = new FileOutputStream(file);
 
             // set properties
-            prop.put(ConfigTypes.ISMIGRATED.nameProp(), ConfigTypes.ISMIGRATED.defaultVal());
+            /*prop.put(ConfigTypes.ISMIGRATED.nameProp(), ConfigTypes.ISMIGRATED.defaultVal());
             prop.put(ConfigTypes.FOLDER_DOWLOAD.nameProp(), ConfigTypes.FOLDER_DOWLOAD.defaultVal());
             prop.put(ConfigTypes.PROXY_USE.nameProp(), ConfigTypes.PROXY_USE.defaultVal());
             prop.put(ConfigTypes.PROXY_HOST.nameProp(), ConfigTypes.PROXY_HOST.defaultVal());
-            prop.put(ConfigTypes.PROXY_PORT.nameProp(), ConfigTypes.PROXY_PORT.defaultVal());            
+            prop.put(ConfigTypes.PROXY_PORT.nameProp(), ConfigTypes.PROXY_PORT.defaultVal());            */
+            
+            for (ConfigTypes value : ConfigTypes.values()) {
+                prop.put(value.nameProp(), value.defaultVal());
+            }
             
 
+            // store properties to the opened file
+            prop.store(fos, comments);
+
+        } catch (IOException ex) {
+            throw new Exception("Error read file: " + file.getAbsolutePath() + "  \nError: " + ex.getMessage());
+        }
+
+    }
+    
+    public void writeAllProperties(Map<String,String> valuesProp) throws Exception {
+        Properties prop = new Properties();
+        FileOutputStream fos = null;      
+        
+        // Order by key
+        SortedSet<String> keys = new TreeSet<>(valuesProp.keySet());
+
+        try {
+
+            // create new file in or open existing file from the project's root folder
+            fos = new FileOutputStream(file);                                
+            
+            /*for (Map.Entry<String, String> entry : valuesProp.entrySet())
+            {                
+                prop.setProperty(entry.getKey(), entry.getValue());
+            }*/
+            
+            for (String key : keys) {
+                prop.setProperty(key, valuesProp.get(key));                
+            }
+            
+            
             // store properties to the opened file
             prop.store(fos, comments);
 

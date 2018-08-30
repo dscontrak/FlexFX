@@ -120,7 +120,7 @@
             </Label>
             <HBox prefHeight="100.0" prefWidth="200.0" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
                <children>
-                  <TextField fx:id="txtClientAddress" promptText="IP Address">
+                  <TextField fx:id="txtClientHost" promptText="IP Address">
                      <HBox.margin>
                         <Insets top="10.0" />
                      </HBox.margin>
@@ -157,7 +157,7 @@
                   <Insets right="20.0" />
                </padding>
             </HBox>
-            <Button mnemonicParsing="false" onAction="#handleClientTest" text="Test client torrent" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+            <Button fx:id="btnTestClient" mnemonicParsing="false" onAction="#handleClientTest" text="Test client torrent" GridPane.columnIndex="1" GridPane.rowIndex="7" />
             <Label text="Client torrent app:" GridPane.rowIndex="6">
                <padding>
                   <Insets right="20.0" />

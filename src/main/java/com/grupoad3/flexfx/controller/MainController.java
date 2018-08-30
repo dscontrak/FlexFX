@@ -445,7 +445,7 @@ public class MainController {
             return;
         }
         try {
-            pathDir = ConfigApp.readProperty(ConfigApp.ConfigTypes.FOLDER_DOWLOAD);
+            pathDir = ConfigApp.readProperty(ConfigApp.ConfigTypes.FOLDER_DOWNLOAD);
             filePath = new File(pathDir);
             if(!filePath.exists()){
                 if(!filePath.mkdirs()){
@@ -460,7 +460,7 @@ public class MainController {
 
                 serviceRssItemsService.setRss(rssSelected);
                 serviceRssItemsService.setFilters(mainApp.getMediaFiltersData());
-                serviceRssItemsService.setPath(ConfigApp.readProperty(ConfigApp.ConfigTypes.FOLDER_DOWLOAD));
+                serviceRssItemsService.setPath(ConfigApp.readProperty(ConfigApp.ConfigTypes.FOLDER_DOWNLOAD));
 
                 // event fail
                 serviceRssItemsService.setOnFailed(eventFail -> {

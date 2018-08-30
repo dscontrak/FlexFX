@@ -160,6 +160,7 @@ public class MainApp extends Application {
                 
                 // Writeproperties
                 config.writeProperty(ConfigApp.ConfigTypes.ISMIGRATED, "true");
+                config.loadProperties();
                 
             }
         } catch (Exception e) {
@@ -270,6 +271,8 @@ public class MainApp extends Application {
             // Set scene and controller
             dialoStage.setScene(scene);
             ConfigController controller = loader.getController();    
+            controller.setMainApp(this);               
+            controller.setDialogStage(dialoStage);
             
              // Show
             dialoStage.showAndWait();
