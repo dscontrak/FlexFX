@@ -15,6 +15,8 @@ import com.grupoad3.flexfx.db.services.RssItemService;
 import com.grupoad3.flexfx.db.services.RssService;
 import com.grupoad3.flexfx.process.ServiceRssItemsTask;
 import com.grupoad3.flexfx.ui.AlertIcon;
+import com.grupoad3.flexfx.ui.TableCellRssItemColorStatus;
+import com.grupoad3.flexfx.ui.TableCellRssItemDateHuman;
 import com.grupoad3.flexfx.util.ConvertionUtil;
 import java.io.File;
 import java.io.IOException;
@@ -44,7 +46,7 @@ import javafx.scene.layout.HBox;
  */
 public class MainController {
 
-    private final String PATTERN_DATE = "yyyy/MM/dd HH:mm:ss";
+    public final String PATTERN_DATE = "yyyy/MM/dd HH:mm:ss";
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(PATTERN_DATE);
 
     // -------- Rss section --------
@@ -116,9 +118,7 @@ public class MainController {
     private Button btnFilterEdit;
 
 
-    // TODO: Solo usar los activos de los filtros y borrar lo relacionado cuando se borre un RSS
-    // TODO: Activar la busqueda de lo descargado y activado/descargado checkbox
-    // TODO: Poner en gris los que estan en ignorado o error.
+    // TODO: Activar la busqueda de lo descargado y activado/descargado checkbox    
     // TODO: Agregar funcionalidad con qBittorrent y Transmission/Deluge solo para agregar basarse en: tympanix / Electorrent
     // TODO: Agregar tooltip y acceso directo por el teclado
 
@@ -229,57 +229,29 @@ public class MainController {
     }
 
     private void mapColumnsRssItems() {
-        columnRssItemTitle.setCellValueFactory(cellData -> cellData.getValue().titleProperty());
-        columnRssItemStatus.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
+        // Values
+        columnRssItemStatus.setCellValueFactory(cellData -> cellData.getValue().statusProperty());                
+        columnRssItemTitle.setCellValueFactory(cellData -> cellData.getValue().titleProperty());        
         columnRssItemFile.setCellValueFactory(cellData -> cellData.getValue().fileProperty());
+        
         columnRssItemPublication.setCellValueFactory(cellData -> convertDateToStringProp(cellData.getValue().getDatepub()));
-
-
         columnRssItemDownloaded.setCellValueFactory(cellData -> convertDateToStringProp(cellData.getValue().getDatedown()));
-
-        columnRssItemPublication.setCellFactory(cellData -> new TableCell<RssItems, String>(){
-
-            private final SimpleDateFormat format = new SimpleDateFormat(PATTERN_DATE);
-
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty); //To change body of generated methods, choose Tools | Templates.
-                Date date;
-                if(empty) {
-                    setText(null);
-                }else {
-                    try {
-                        date = format.parse(item);
-                        item = ConvertionUtil.convertHumanDate(date);
-                    } catch (ParseException ex) {
-                        //ignored
-                    }
-                    this.setText(item);
-                }
-            }
-
+        
+        // Factories
+        columnRssItemStatus.setCellFactory((TableColumn<RssItems, String> param) -> {
+            return new TableCellRssItemColorStatus();
         });
-        columnRssItemDownloaded.setCellFactory(cellData -> new TableCell<RssItems, String>(){
-
-            private final SimpleDateFormat format = new SimpleDateFormat(PATTERN_DATE);
-
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty); //To change body of generated methods, choose Tools | Templates.
-                Date date;
-                if(empty) {
-                    setText(null);
-                }else {
-                    try {
-                        date = format.parse(item);
-                        item = ConvertionUtil.convertHumanDate(date);
-                    } catch (ParseException ex) {
-                        //ignored
-                    }
-                    this.setText(item);
-                }
-            }
-
+        columnRssItemTitle.setCellFactory((TableColumn<RssItems, String> param) -> {
+            return new TableCellRssItemColorStatus();
+        });
+        columnRssItemFile.setCellFactory((TableColumn<RssItems, String> param) -> {
+            return new TableCellRssItemColorStatus();
+        });
+        columnRssItemPublication.setCellFactory((TableColumn<RssItems, String> param) -> {
+            return new TableCellRssItemDateHuman();
+        });        
+        columnRssItemDownloaded.setCellFactory((TableColumn<RssItems, String> param) -> {
+            return new TableCellRssItemDateHuman();
         });
 
     }
@@ -386,8 +358,11 @@ public class MainController {
             if (isConfirmDeletion()) {
 
                 rssService = new RssService();
-                rssService.deleteById(new Long(rssSelected.getId()));
-                mainApp.getRssData().remove(rssSelected);
+                //rssService.deleteById(new Long(rssSelected.getId()));
+                boolean isAffected = rssService.eraserSoft(rssSelected);
+                if(isAffected){
+                    mainApp.getRssData().remove(rssSelected);
+                }
 
             }
 
@@ -457,7 +432,7 @@ public class MainController {
                 lblProgress.textProperty().bind(serviceRssItemsService.messageProperty());
 
                 serviceRssItemsService.setRss(rssSelected);
-                serviceRssItemsService.setFilters(mainApp.getMediaFiltersData());
+                //serviceRssItemsService.setFilters(mainApp.getMediaFiltersData()); //Change only active
                 serviceRssItemsService.setPath(ConfigApp.readProperty(ConfigApp.ConfigTypes.FOLDER_DOWNLOAD));
 
                 // event fail

@@ -18,63 +18,74 @@ import java.util.List;
  * @author daniel_serna
  */
 @SuppressWarnings("unchecked")
-public class MediaFilterService extends AbstractDaoService<MediaFilters>{
-    
+public class MediaFilterService extends AbstractDaoService<MediaFilters> {
+
     public MediaFilterService() {
-        super(MediaFilters.class);        
+        super(MediaFilters.class);
     }
-    
-    public List<MediaFilters> getLast(long limit, long offset, boolean withDeleted) throws IOException{
-        
+
+    public List<MediaFilters> getLast(long limit, long offset, boolean withDeleted) throws IOException {
+
         // return all with deleted
         if (withDeleted) {
             return super.getAll(limit, offset);
-        }else{
-        
+        } else {
+
             try {
-                QueryBuilder builder = dao.queryBuilder();                
-                if(limit != -1l)
-                {
+                QueryBuilder builder = dao.queryBuilder();
+                if (limit != -1l) {
                     builder.limit(limit);
                 }
-                
-                if(offset != -1l){
+
+                if (offset != -1l) {
                     builder.offset(offset);
                 }
-                
+
                 builder.where().eq(RssItems.DELETED_FIELD_NAME, false);
                 return builder.query();
-                
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        
+
         return null;
     }
-    
-    public List<MediaFilters> getLastItemsByRss(Rss rss, long limit, long offset ){
+
+    public List<MediaFilters> getLastItemsByRss(Rss rss, long limit, long offset) {
         try {
-            QueryBuilder builder = dao.queryBuilder();                
-                if(limit != -1l)
-                {
-                    builder.limit(limit);
-                }
-                
-                if(offset != -1l){
-                    builder.offset(offset);
-                }
-                
-                builder.where().eq(RssItems.ID_RSS_FIELD_NAME, rss.getId());
-                
-                return builder.query();
-                
+            QueryBuilder builder = dao.queryBuilder();
+            if (limit != -1l) {
+                builder.limit(limit);
+            }
+
+            if (offset != -1l) {
+                builder.offset(offset);
+            }
+
+            builder.where().eq(RssItems.ID_RSS_FIELD_NAME, rss.getId());
+
+            return builder.query();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
-        
+
         return null;
     }
-    
+
+    public List<MediaFilters> getAllActiveByRss(Rss rss) {
+        try {
+            QueryBuilder builder = dao.queryBuilder();
+            builder.where().eq(RssItems.ID_RSS_FIELD_NAME, rss.getId());
+            builder.where().eq(RssItems.STATUS_FIELD_NAME, true);
+            return builder.query();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
 }

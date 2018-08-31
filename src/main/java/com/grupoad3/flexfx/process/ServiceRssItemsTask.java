@@ -10,6 +10,7 @@ import com.grupoad3.flexfx.db.model.ItemStatus;
 import com.grupoad3.flexfx.db.model.MediaFilters;
 import com.grupoad3.flexfx.db.model.Rss;
 import com.grupoad3.flexfx.db.model.RssItems;
+import com.grupoad3.flexfx.db.services.MediaFilterService;
 import com.grupoad3.flexfx.db.services.RssItemService;
 import com.grupoad3.flexfx.util.ComparatorRssDate;
 import com.grupoad3.flexfx.util.CompareUtil;
@@ -57,16 +58,16 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
     private final StringProperty proxyhost = new SimpleStringProperty(this, "proxyhost");
 
     private Rss rss;
-    private List<MediaFilters> filters;
+    //private List<MediaFilters> filters;
     private String path;
 
     public final void setRss(Rss value) {
         rss = value;
     }
 
-    public void setFilters(List<MediaFilters> filters) {
+    /*public void setFilters(List<MediaFilters> filters) {
         this.filters = filters;
-    }
+    }*/
 
     public void setPath(String path) {
         this.path = path;
@@ -98,8 +99,7 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
 
     @Override
     protected Task<List<RssItems>> createTask() {
-        final Rss _rss = rss;
-        final List<MediaFilters> _filters = filters;
+        final Rss _rss = rss;        
         final String _path = path;
 
         return new Task<List<RssItems>>() {
@@ -121,6 +121,7 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
                 // Data and rss
                 HashSet<RssItems> itemsAll = new HashSet<>();
                 TreeSet<RssItems> itemsToAdd = new TreeSet<>(new ComparatorRssDate());
+                
                 String proxyHost;
                 Integer proxyPort;
                 HttpHost proxyHostObject = null;
@@ -128,7 +129,9 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
 
                 // Database
                 RssItemService itemService;
+                MediaFilterService filterService;
                 List<RssItems> lastItems;
+                List<MediaFilters> filters;
 
                 updateMessage("Reading rss... ");
 
@@ -189,7 +192,11 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
                         itemsAll.add(item);
 
                     }
-
+                    
+                    // Get all filters
+                    filterService = new MediaFilterService();
+                    filters = filterService.getLastItemsByRss(rss, 0, 0);
+                    
                     int indexItem = 1;
                     // Analize data wiht local and remote data
                     for (RssItems itemToAnalize : itemsAll) {
@@ -197,7 +204,7 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
                         updateMessage("Analyzing " + indexItem + "/" + itemsAll.size());
                         indexItem++;
                         //updateMessage(_path);
-                        if (anlyzeRssItem(itemToAnalize, _filters) != null) {
+                        if (anlyzeRssItem(itemToAnalize, filters) != null) {
                             itemsToAdd.add(itemToAnalize);
                         }
                     }

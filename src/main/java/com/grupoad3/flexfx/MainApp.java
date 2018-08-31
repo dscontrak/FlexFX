@@ -91,7 +91,7 @@ public class MainApp extends Application {
 
             // Show the scene containing the root layout.
             Scene scene = new Scene(mainWindow);
-
+            scene.getStylesheets().add(getClass().getResource("/styles/Styles.css").toString());
             primaryStage.setScene(scene);
             primaryStage.show();
             
@@ -133,7 +133,7 @@ public class MainApp extends Application {
         try {
             RssService rssService = new RssService();                                         
             
-            List<Rss> listRss = rssService.getLastRss(10, 0, true);
+            List<Rss> listRss = rssService.getLastRssNotDeleted();
             listRss.forEach((r) -> {
                 rssData.add(r);
             });                                    

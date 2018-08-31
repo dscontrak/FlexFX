@@ -14,6 +14,7 @@ import com.grupoad3.flexfx.db.services.MediaFilterService;
 import com.grupoad3.flexfx.db.services.RssItemService;
 import com.grupoad3.flexfx.db.services.RssService;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.After;
@@ -85,8 +86,10 @@ public class ModelMediaAndItemsCreate {
             item.setTitle("titulo" + random);
             item.setGuid("guid" + random);
             item.setRss(rss);
-            item.setStatus(ItemStatus.DOWNLOADED);
+            item.setStatus(ItemStatus.IGNORED);
             item.setLink("link"+random);
+            item.setDatepub(LocalDateTime.now());
+            item.setDatedown(LocalDateTime.now());
             
             itemCreated = rssItemService.create(item);
             
