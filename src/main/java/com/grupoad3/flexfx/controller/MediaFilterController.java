@@ -46,7 +46,7 @@ public class MediaFilterController {
 
     @FXML
     private TextField txtSecFilter;
-    
+
      @FXML
     private TextField txtIgnoreFilter;
 
@@ -65,7 +65,6 @@ public class MediaFilterController {
     @FXML
     private RadioButton rbnInactive;
 
-    //TODO: * Agregar lo que no debe contener
 
     private Rss rss;
 

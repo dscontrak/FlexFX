@@ -7,3 +7,4 @@ config.properties
 *.7z
 *.epgz
 /nbproject/
+downloads/

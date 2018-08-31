@@ -50,6 +50,7 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
 
     final String errorStatus = ItemStatus.ERROR.toString();
     final String downStatus = ItemStatus.DOWNLOADED.toString();
+    final String ignoreStatus = ItemStatus.IGNORED.toString();
 
     private final BooleanProperty proxyuse = new SimpleBooleanProperty(this, "proxyuse", false);
     private final IntegerProperty proxyport = new SimpleIntegerProperty(this, "proxyport");
@@ -203,7 +204,7 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
 
                     indexItem = 1;
                     for (RssItems itemToAnalize : itemsToAdd) {
-                        updateMessage("Downloading/Save " + indexItem + "/" + itemsToAdd.size());
+                        updateMessage("Save " + indexItem + "/" + itemsToAdd.size());
                         indexItem++;
                         downloadAndSave(itemToAnalize, itemService);
                     }
@@ -218,35 +219,48 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
             }
 
             private void downloadAndSave(RssItems itemToAnalize, RssItemService db) {
-                if (itemToAnalize.isDonwloadNow()) {
 
-                    if (itemToAnalize.getStatus().equals(downStatus) && itemToAnalize.isDonwloadNow()) {
-                        String url = itemToAnalize.getLink();
-                        String fileName = url.substring(url.lastIndexOf('/') + 1, url.length());
+                // if has been donwloaded return
+                if (itemToAnalize.getStatus().equals(downStatus)) {
+                    return;
+                }
 
-                        DownloadFileHttpCilent downloadFile = new DownloadFileHttpCilent(url, path + "/" + fileName);
-                        try {
-                            downloadFile.download();
-                        } catch (IOException ex) {
-                            Logger.getLogger(ServiceRssItemsTask.class.getName()).log(Level.SEVERE, null, ex);
-                            itemToAnalize.setStatus(ItemStatus.ERROR);
-                        }
-                        itemToAnalize.setFile(fileName);
-                        itemToAnalize.setDatedown(LocalDateTime.now());
+                if (itemToAnalize.isApplyMainFilter()
+                        && itemToAnalize.isApplySecondFilter()) {
+                    itemToAnalize.setStatus(ItemStatus.DOWNLOADED);
+                }
+
+                if(itemToAnalize.isApplyMainFilter() && itemToAnalize.isApplyIgnoreFilter()){
+                    itemToAnalize.setStatus(ItemStatus.IGNORED);
+                }
+
+                if (itemToAnalize.getStatus().equals(downStatus)) {
+
+                    String url = itemToAnalize.getLink();
+                    String fileName = url.substring(url.lastIndexOf('/') + 1, url.length());
+
+                    DownloadFileHttpCilent downloadFile = new DownloadFileHttpCilent(url, path + "/" + fileName);
+                    try {
+                        downloadFile.download();
+                    } catch (IOException ex) {
+                        Logger.getLogger(ServiceRssItemsTask.class.getName()).log(Level.SEVERE, null, ex);
+                        itemToAnalize.setStatus(ItemStatus.ERROR);
                     }
+                    itemToAnalize.setFile(fileName);
+                    itemToAnalize.setDatedown(LocalDateTime.now());
 
                 }
 
                 try {
-                    if (itemToAnalize.isDonwloadNow() && itemToAnalize.isOriginRss() == false) {
-                        db.update(itemToAnalize);
-                    } else if (itemToAnalize.isOriginRss()) {
+                    if (itemToAnalize.isOriginRss()) {
                         db.create(itemToAnalize);
+                    } else if(itemToAnalize.getStatus().equals(downStatus) || itemToAnalize.getStatus().equals(errorStatus)) {
+                        db.update(itemToAnalize);
                     }
-
                 } catch (IOException ex) {
                     Logger.getLogger(ServiceRssItemsTask.class.getName()).log(Level.SEVERE, null, ex);
                 }
+
             }
 
             private RssItems anlyzeRssItem(RssItems item, List<MediaFilters> _filters) {
@@ -270,33 +284,37 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
                         boolean applyMainFilter = false;
                         boolean applySecondaryFilter = false;
 
+                        if (item.isApplyMainFilter()) {
+                            return; // Continue
+                        }
+
+                        // Main filter
                         if (filter.getFiltermain().isEmpty()) {
                             return; // Continue
                         } else if (CompareUtil.containsIgnoreCase(item.getTitle(), filter.getFiltermain())) {
-                            applyMainFilter = true;
-                        }
-
-                        if (filter.getFiltersecondary().isEmpty()) {
-                            applySecondaryFilter = true;
-                        } else if (CompareUtil.containsIgnoreCase(item.getTitle(), filter.getFiltersecondary())) {
-                            applySecondaryFilter = true;
-                        }
-
-                        if (applyMainFilter && applySecondaryFilter) {
-                            item.setDonwloadNow(true);
-                            item.setStatus(ItemStatus.DOWNLOADED);
-                        }
-                        item.setApplyMainFilter(applyMainFilter);
-
-                        if(item.isApplyMainFilter()){
+                            item.setApplyMainFilter(true);
                             item.setMediafilter(filter);
                         }
+
+                        // Secondary Filter
+                        if (filter.getFiltersecondary().isEmpty()) {
+                            item.setApplySecondFilter(true);
+                        } else if (CompareUtil.containsIgnoreCase(item.getTitle(), filter.getFiltersecondary())) {
+                            item.setApplySecondFilter(true);
+                        }
+
+                        // Ignored filter
+                        if (filter.getFilterignore() != null
+                                && filter.getFilterignore().isEmpty() == false
+                                && CompareUtil.containsIgnoreCase(item.getTitle(), filter.getFilterignore())) {
+                            item.setApplyIgnoreFilter(true);
+                        }
+
 
                     });
 
                 } catch (Exception e) {
                     item.setStatus(ItemStatus.ERROR);
-                    //db.create(item);
                     e.printStackTrace();
                 }
 

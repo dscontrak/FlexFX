@@ -20,6 +20,10 @@ public class ConvertionUtil {
                 dateToConvert.getTime()).toLocalDateTime();
     }
 
+    public synchronized static String convertHumanDate(LocalDateTime date) {
+        return convertHumanDate(java.sql.Timestamp.valueOf(date));
+    }
+
     public synchronized static String convertHumanDate(Date date) {
         // http://lea.verou.me/2009/04/java-pretty-dates/
         long current = (new Date()).getTime(),
@@ -72,11 +76,11 @@ public class ConvertionUtil {
                 return new SimpleDateFormat("d-MMM-yyyy").format(date);
             case "week":
             case "month":
-                return new SimpleDateFormat("d MMM',' h:mm a").format(date);
+                return new SimpleDateFormat("d MMM',' HH:mm").format(date);
             case "day":
-                return new SimpleDateFormat("EEE',' h:mm a").format(date);
+                return new SimpleDateFormat("EEE',' HH:mm").format(date);
             case "hr":
-                return new SimpleDateFormat("h:mm a").format(date);
+                return new SimpleDateFormat("HH:mm").format(date);
             default:
                 return amount + " " + what + "s ago";
         }

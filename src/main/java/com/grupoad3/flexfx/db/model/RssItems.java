@@ -44,8 +44,11 @@ public class RssItems {
         _deleted = false;
         _fadd = LocalDateTime.now();
         _fmod = LocalDateTime.now();
-        downloadNow = false;
+        //downloadNow = false;
         originRss = false;
+        applyMainFilter = false;
+        applySecondFilter = false;
+        applyIgnoreFilter = false;
     }
 
     @DatabaseField(columnName = ID_FIELD_NAME, generatedId = true)
@@ -95,9 +98,12 @@ public class RssItems {
     private BooleanProperty deleted;
 
     // No database property
-    private boolean downloadNow;
+    //private boolean downloadNow;
     private boolean originRss;
+
     private boolean applyMainFilter;
+    private boolean applySecondFilter;
+    private boolean applyIgnoreFilter;
 
     public boolean isApplyMainFilter() {
         return applyMainFilter;
@@ -107,13 +113,31 @@ public class RssItems {
         this.applyMainFilter = applyMainFilter;
     }
 
-    public boolean isDonwloadNow() {
-        return downloadNow;
+    public boolean isApplySecondFilter() {
+        return applySecondFilter;
     }
 
-    public void setDonwloadNow(boolean originBD) {
-        this.downloadNow = originBD;
+    public void setApplySecondFilter(boolean applySecondFilter) {
+        this.applySecondFilter = applySecondFilter;
     }
+
+    public boolean isApplyIgnoreFilter() {
+        return applyIgnoreFilter;
+    }
+
+    public void setApplyIgnoreFilter(boolean applyIgnoreFilter) {
+        this.applyIgnoreFilter = applyIgnoreFilter;
+    }
+
+
+
+    /*public boolean isDonwloadNow() {
+        return downloadNow;
+    }*/
+
+    /*public void setDonwloadNow(boolean originBD) {
+        this.downloadNow = originBD;
+    }*/
 
     public boolean isOriginRss() {
         return originRss;

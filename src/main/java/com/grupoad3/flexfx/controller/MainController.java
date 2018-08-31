@@ -102,7 +102,7 @@ public class MainController {
 
     @FXML
     private TableColumn<MediaFilters, String> columnFilterSecondaryFilter;
-    
+
     @FXML
     private TableColumn<MediaFilters, String> columnFilterIgnore;
 
@@ -114,12 +114,11 @@ public class MainController {
 
     @FXML
     private Button btnFilterEdit;
-    
-    
-    // TODO: * Agregar la configuración principal y también de la útlima syncronización con la fecha convertida, `filter_ignore` VARCHAR
-    // TODO: * Poner en el algoritmo el ignorado
+
+
+    // TODO: Solo usar los activos de los filtros y borrar lo relacionado cuando se borre un RSS
     // TODO: Activar la busqueda de lo descargado y activado/descargado checkbox
-    // TODO: Poner en gris los que estan en ignorado o error.    
+    // TODO: Poner en gris los que estan en ignorado o error.
     // TODO: Agregar funcionalidad con qBittorrent y Transmission/Deluge solo para agregar basarse en: tympanix / Electorrent
     // TODO: Agregar tooltip y acceso directo por el teclado
 
@@ -188,7 +187,7 @@ public class MainController {
             lblRssTitle.setText(rss.getTitle());
             lblRssUrl.setText(rss.getLinkrss());
             if (rss.getLastsync() != null) {
-                lblRssLastSync.setText(rss.getLastsync().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+                lblRssLastSync.setText( "Last sync: " + ConvertionUtil.convertHumanDate(rss.getLastsync()));
             }
 
             setLastItemsByRss(rss);
@@ -314,11 +313,11 @@ public class MainController {
 
         // add items
         filters.forEach(f -> mainApp.getMediaFiltersData().add(f));
-        
+
 
         //mapColumnsFilters();
     }
-    
+
     @FXML
     void handleConfig(ActionEvent event) {
         boolean isSaved = mainApp.showConfigDialog();
@@ -326,7 +325,7 @@ public class MainController {
             System.out.println("Is saved");
         }
     }
-    
+
     @FXML
     void handleMediaFilterAdd(ActionEvent event) {
         MediaFilters filter = new MediaFilters();
@@ -378,7 +377,6 @@ public class MainController {
     @FXML
     void handleRssDel(ActionEvent event) {
         RssService rssService;
-        // TODO: Agregar para eliminar todo lo dependiente
         try {
 
             if (rssSelected == null) {
@@ -477,7 +475,7 @@ public class MainController {
                         try {
                             RssService rssService = new RssService();
                             rssSelected.setLastsync(LocalDateTime.now());
-                            lblRssLastSync.setText(rssSelected.getLastsync().toString());
+                            lblRssLastSync.setText("Last Sync: " + ConvertionUtil.convertHumanDate(rssSelected.getLastsync()));
                             rssService.update(rssSelected);
                         } catch (IOException ex) {
                             mainApp.showAlertWithEx(ex);
