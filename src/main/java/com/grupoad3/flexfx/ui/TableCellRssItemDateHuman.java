@@ -12,7 +12,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
 
 /**
  *
@@ -20,8 +19,8 @@ import javafx.scene.control.TableColumn;
  */
 public class TableCellRssItemDateHuman extends TableCell<RssItems, String> {
 
-    private final SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");          
-    //private final TableColumn<RssItems, String> param; 
+    private final SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+    //private final TableColumn<RssItems, String> param;
     /*public TableCellDateHuman(TableColumn<RssItems, String> param) {
         this.param = param;
     }*/
@@ -34,22 +33,24 @@ public class TableCellRssItemDateHuman extends TableCell<RssItems, String> {
             setText(null);
         } else {
             try {
-                
+
                 int row = getIndex();
                 RssItems rssItem = getTableView().getItems().get(row);
-                if(rssItem.getStatus().equals(ItemStatus.IGNORED.toString())){
-                    this.getStyleClass().add("inactive-column");
-                }else{
-                    this.getStyleClass().remove("inactive-column");
+                if (rssItem.getStatus().equals(ItemStatus.IGNORED.toString())) {
+                    if (this.getStyleClass().contains("inactive-column") == false) {
+                        this.getStyleClass().add("inactive-column");
+                    }
+                } else {
+                    this.getStyleClass().removeAll("inactive-column");
                 }
-                
+
                 date = format.parse(item);
                 item = ConvertionUtil.convertHumanDate(date);
             } catch (ParseException ex) {
                 //ignored
             }
             this.setText(item);
-            
+
         }
     }
 }

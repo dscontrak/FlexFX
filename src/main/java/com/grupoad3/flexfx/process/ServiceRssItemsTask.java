@@ -99,7 +99,7 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
 
     @Override
     protected Task<List<RssItems>> createTask() {
-        final Rss _rss = rss;        
+        final Rss _rss = rss;
         final String _path = path;
 
         return new Task<List<RssItems>>() {
@@ -121,7 +121,7 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
                 // Data and rss
                 HashSet<RssItems> itemsAll = new HashSet<>();
                 TreeSet<RssItems> itemsToAdd = new TreeSet<>(new ComparatorRssDate());
-                
+
                 String proxyHost;
                 Integer proxyPort;
                 HttpHost proxyHostObject = null;
@@ -164,7 +164,7 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
 
                     // Get data from database and add rss
                     itemService = new RssItemService();
-                    lastItems = itemService.getLastItemsByRss(_rss, feed.getEntries().size(), 0);
+                    lastItems = itemService.getLastAlltemsByRss(_rss, feed.getEntries().size(), 0, false);
                     lastItems.forEach(i -> {
                         itemsAll.add(i);
                     });
@@ -192,11 +192,11 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
                         itemsAll.add(item);
 
                     }
-                    
+
                     // Get all filters
                     filterService = new MediaFilterService();
-                    filters = filterService.getLastItemsByRss(rss, 0, 0);
-                    
+                    filters = filterService.getAllActiveByRss(rss);
+
                     int indexItem = 1;
                     // Analize data wiht local and remote data
                     for (RssItems itemToAnalize : itemsAll) {
@@ -288,8 +288,8 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
                     }
 
                     _filters.forEach(filter -> {
-                        boolean applyMainFilter = false;
-                        boolean applySecondaryFilter = false;
+                        //boolean applyMainFilter = false;
+                        //boolean applySecondaryFilter = false;
 
                         if (item.isApplyMainFilter()) {
                             return; // Continue

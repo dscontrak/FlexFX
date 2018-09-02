@@ -5,15 +5,14 @@
  */
 package com.grupoad3.flexfx.ui;
 
-import com.grupoad3.flexfx.db.model.ItemStatus;
-import com.grupoad3.flexfx.db.model.RssItems;
+import com.grupoad3.flexfx.db.model.MediaFilters;
 import javafx.scene.control.TableCell;
 
 /**
  *
  * @author daniel_serna
  */
-public class TableCellRssItemColorStatus extends TableCell<RssItems, String> {
+public class TableCellMediaFilterColorActive extends TableCell<MediaFilters, String> {
 
     @Override
     protected void updateItem(String item, boolean empty) {
@@ -23,8 +22,8 @@ public class TableCellRssItemColorStatus extends TableCell<RssItems, String> {
         } else {
 
             int row = getIndex();
-            RssItems rssItem = getTableView().getItems().get(row);
-            if (rssItem.getStatus().equals(ItemStatus.IGNORED.toString())) {
+            MediaFilters rssItem = getTableView().getItems().get(row);
+            if (rssItem.getActive() == false) {
                 if (this.getStyleClass().contains("inactive-column") == false) {
                     this.getStyleClass().add("inactive-column");
                 }

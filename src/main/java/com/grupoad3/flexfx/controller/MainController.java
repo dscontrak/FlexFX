@@ -15,16 +15,14 @@ import com.grupoad3.flexfx.db.services.RssItemService;
 import com.grupoad3.flexfx.db.services.RssService;
 import com.grupoad3.flexfx.process.ServiceRssItemsTask;
 import com.grupoad3.flexfx.ui.AlertIcon;
+import com.grupoad3.flexfx.ui.TableCellMediaFilterColorActive;
 import com.grupoad3.flexfx.ui.TableCellRssItemColorStatus;
 import com.grupoad3.flexfx.ui.TableCellRssItemDateHuman;
 import com.grupoad3.flexfx.util.ConvertionUtil;
 import java.io.File;
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import javafx.beans.property.BooleanProperty;
@@ -34,8 +32,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.HBox;
@@ -89,6 +87,9 @@ public class MainController {
     @FXML
     private TableColumn<RssItems, String> columnRssItemDownloaded;
 
+    @FXML
+    private CheckBox chkItemsDownloaded;
+
     // ------ Media filter section --------------
     @FXML
     private TableView<MediaFilters> tableFilters;
@@ -117,16 +118,16 @@ public class MainController {
     @FXML
     private Button btnFilterEdit;
 
+    @FXML
+    private CheckBox chkFilterActive;
 
-    // TODO: Activar la busqueda de lo descargado y activado/descargado checkbox    
+    // TODO: Activar la busqueda de lo descargado
     // TODO: Agregar funcionalidad con qBittorrent y Transmission/Deluge solo para agregar basarse en: tympanix / Electorrent
     // TODO: Agregar tooltip y acceso directo por el teclado
-
     // ---- Future
     // TODO: Poner el proceso de carga debajo del boton de descarga
     // TODO: Poner la funcionalidad del media filter con los archivos descargdos relacionados
     // TODO: Obtener información de API de algun lado del titulo
-
     // Reference to the main application.
     private MainApp mainApp;
     private Rss rssSelected;
@@ -177,6 +178,8 @@ public class MainController {
 
         mapColumnsFilters();
         mapColumnsRssItems();
+        listerCheckboxItemsDownload();
+        listerCheckboxActiveFilter();
 
     }
 
@@ -187,7 +190,7 @@ public class MainController {
             lblRssTitle.setText(rss.getTitle());
             lblRssUrl.setText(rss.getLinkrss());
             if (rss.getLastsync() != null) {
-                lblRssLastSync.setText( "Last sync: " + ConvertionUtil.convertHumanDate(rss.getLastsync()));
+                lblRssLastSync.setText("Last sync: " + ConvertionUtil.convertHumanDate(rss.getLastsync()));
             }
 
             setLastItemsByRss(rss);
@@ -204,7 +207,7 @@ public class MainController {
 
     private void setLastItemsByRss(Rss rss) {
         RssItemService itemService = new RssItemService();
-        List<RssItems> items = itemService.getLastItemsByRss(rss, 100, 0);
+        List<RssItems> items = itemService.getLastAlltemsByRss(rss, 100, 0, false);
 
         // clear
         mainApp.getRssItemsData().clear();
@@ -215,42 +218,61 @@ public class MainController {
 
         // add items
         items.forEach(i -> mainApp.getRssItemsData().add(i));
-        tableRssItems.setItems(mainApp.getRssItemsData());
+        //tableRssItems.setItems(mainApp.getRssItemsData());
 
         //mapColumnsRssItems();
     }
 
     private void mapColumnsFilters() {
+        // Values
         columnFilterActive.setCellValueFactory(cellData -> convertActivedToStringProp(cellData.getValue().activeProperty()));
         columnFilterTitle.setCellValueFactory(cellData -> cellData.getValue().titleProperty());
         columnFilterMainFilter.setCellValueFactory(cellData -> cellData.getValue().filtermainProperty());
         columnFilterSecondaryFilter.setCellValueFactory(cellData -> cellData.getValue().filtersecondaryProperty());
         columnFilterIgnore.setCellValueFactory(cellData -> cellData.getValue().filterignoreProperty());
+
+        // Factory
+        columnFilterActive.setCellFactory((param) -> {
+            return new TableCellMediaFilterColorActive();
+        });
+        columnFilterTitle.setCellFactory((param) -> {
+            return new TableCellMediaFilterColorActive();
+        });
+        columnFilterMainFilter.setCellFactory((param) -> {
+            return new TableCellMediaFilterColorActive();
+        });
+        columnFilterSecondaryFilter.setCellFactory((param) -> {
+            return new TableCellMediaFilterColorActive();
+        });
+        columnFilterIgnore.setCellFactory((param) -> {
+            return new TableCellMediaFilterColorActive();
+        });
+
     }
 
     private void mapColumnsRssItems() {
         // Values
-        columnRssItemStatus.setCellValueFactory(cellData -> cellData.getValue().statusProperty());                
-        columnRssItemTitle.setCellValueFactory(cellData -> cellData.getValue().titleProperty());        
+        columnRssItemStatus.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
+        columnRssItemTitle.setCellValueFactory(cellData -> cellData.getValue().titleProperty());
         columnRssItemFile.setCellValueFactory(cellData -> cellData.getValue().fileProperty());
-        
+
         columnRssItemPublication.setCellValueFactory(cellData -> convertDateToStringProp(cellData.getValue().getDatepub()));
         columnRssItemDownloaded.setCellValueFactory(cellData -> convertDateToStringProp(cellData.getValue().getDatedown()));
-        
+
         // Factories
-        columnRssItemStatus.setCellFactory((TableColumn<RssItems, String> param) -> {
+        columnRssItemStatus.setCellFactory((param) -> {
             return new TableCellRssItemColorStatus();
         });
-        columnRssItemTitle.setCellFactory((TableColumn<RssItems, String> param) -> {
+        columnRssItemTitle.setCellFactory((param) -> {
             return new TableCellRssItemColorStatus();
         });
-        columnRssItemFile.setCellFactory((TableColumn<RssItems, String> param) -> {
+        columnRssItemFile.setCellFactory((param) -> {
             return new TableCellRssItemColorStatus();
         });
-        columnRssItemPublication.setCellFactory((TableColumn<RssItems, String> param) -> {
+        columnRssItemPublication.setCellFactory((param) -> {
             return new TableCellRssItemDateHuman();
-        });        
-        columnRssItemDownloaded.setCellFactory((TableColumn<RssItems, String> param) -> {
+        });
+        columnRssItemDownloaded.setCellFactory((param) -> {
             return new TableCellRssItemDateHuman();
         });
 
@@ -274,7 +296,7 @@ public class MainController {
 
     private void setLastMediaFiltersByRss(Rss rss) {
         MediaFilterService filterService = new MediaFilterService();
-        List<MediaFilters> filters = filterService.getLastItemsByRss(rss, 20, 0);
+        List<MediaFilters> filters = filterService.getLastItemsByRss(rss, 50, 0);
 
         // clear
         mainApp.getMediaFiltersData().clear();
@@ -286,14 +308,13 @@ public class MainController {
         // add items
         filters.forEach(f -> mainApp.getMediaFiltersData().add(f));
 
-
         //mapColumnsFilters();
     }
 
     @FXML
     void handleConfig(ActionEvent event) {
         boolean isSaved = mainApp.showConfigDialog();
-        if(isSaved){
+        if (isSaved) {
             System.out.println("Is saved");
         }
     }
@@ -312,7 +333,7 @@ public class MainController {
     void handleMediaFilterEdit(ActionEvent event) {
         MediaFilters filter = filterSelected;
 
-        if(filterSelected == null){
+        if (filterSelected == null) {
             return;
         }
 
@@ -360,7 +381,7 @@ public class MainController {
                 rssService = new RssService();
                 //rssService.deleteById(new Long(rssSelected.getId()));
                 boolean isAffected = rssService.eraserSoft(rssSelected);
-                if(isAffected){
+                if (isAffected) {
                     mainApp.getRssData().remove(rssSelected);
                 }
 
@@ -408,7 +429,6 @@ public class MainController {
         String pathDir;
         File filePath;
 
-
         if (mainApp.getMediaFiltersData() != null && mainApp.getMediaFiltersData().isEmpty()) {
             alert = new AlertIcon(Alert.AlertType.WARNING);
             alert.setTitle("Warning");
@@ -420,8 +440,8 @@ public class MainController {
         try {
             pathDir = ConfigApp.readProperty(ConfigApp.ConfigTypes.FOLDER_DOWNLOAD);
             filePath = new File(pathDir);
-            if(!filePath.exists()){
-                if(!filePath.mkdirs()){
+            if (!filePath.exists()) {
+                if (!filePath.mkdirs()) {
                     throw new Exception("Dont is possible create a folder in: \n" + filePath.getAbsolutePath());
                 }
             }
@@ -474,6 +494,53 @@ public class MainController {
         btnFilterAdd.setDisable(false);
         btnFilterDel.setDisable(false);
         btnFilterEdit.setDisable(false);
+        chkItemsDownloaded.setSelected(false);
+        chkItemsDownloaded.setDisable(false);
+
+        chkFilterActive.setDisable(false);
+        chkFilterActive.setSelected(false);
+
+    }
+
+    private void listerCheckboxItemsDownload() {
+        chkItemsDownloaded.selectedProperty().addListener((observable, oldValue, isChecked) -> {
+
+            if (rssSelected == null) {
+                return;
+            }
+
+            // Para evitar el error de los colores multiples
+            //tableRssItems.getItems().clear();
+            RssItemService itemService = new RssItemService();
+            List<RssItems> items;
+            if (isChecked) {
+                items = itemService.getLastItemsDownloadedByRss(rssSelected);
+            } else {
+                items = itemService.getLastAlltemsByRss(rssSelected, 100, 0, false);
+
+            }
+            mainApp.getRssItemsData().setAll(items);
+        });
+    }
+
+    private void listerCheckboxActiveFilter() {
+        chkFilterActive.selectedProperty().addListener((observable, oldValue, isChecked) -> {
+            if (rssSelected == null) {
+                return;
+            }
+
+            MediaFilterService filterService = new MediaFilterService();
+            List<MediaFilters> filters;
+
+            if (isChecked) {
+                filters = filterService.getAllActiveByRss(rssSelected);
+            } else {
+                filters = filterService.getLastItemsByRss(rssSelected, 50, 0);
+            }
+
+            mainApp.getMediaFiltersData().setAll(filters);
+
+        });
     }
 
 }

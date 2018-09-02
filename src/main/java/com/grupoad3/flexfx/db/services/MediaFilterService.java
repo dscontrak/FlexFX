@@ -77,8 +77,10 @@ public class MediaFilterService extends AbstractDaoService<MediaFilters> {
     public List<MediaFilters> getAllActiveByRss(Rss rss) {
         try {
             QueryBuilder builder = dao.queryBuilder();
-            builder.where().eq(RssItems.ID_RSS_FIELD_NAME, rss.getId());
-            builder.where().eq(RssItems.STATUS_FIELD_NAME, true);
+            builder.where()
+                    .eq(MediaFilters.RSS_ID_FIELD_NAME, rss.getId())
+                    .and()
+                    .eq(MediaFilters.ACTIVE_FIELD_NAME, true);
             return builder.query();
 
         } catch (Exception e) {
