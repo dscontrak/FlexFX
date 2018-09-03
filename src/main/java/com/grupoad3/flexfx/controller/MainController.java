@@ -7,6 +7,7 @@ package com.grupoad3.flexfx.controller;
 
 import com.grupoad3.flexfx.ConfigApp;
 import com.grupoad3.flexfx.MainApp;
+import com.grupoad3.flexfx.db.model.ItemStatus;
 import com.grupoad3.flexfx.db.model.MediaFilters;
 import com.grupoad3.flexfx.db.model.Rss;
 import com.grupoad3.flexfx.db.model.RssItems;
@@ -36,6 +37,8 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 
 /**
@@ -90,6 +93,9 @@ public class MainController {
     @FXML
     private CheckBox chkItemsDownloaded;
 
+    @FXML
+    private TextField txtItemsSearch;
+
     // ------ Media filter section --------------
     @FXML
     private TableView<MediaFilters> tableFilters;
@@ -120,6 +126,9 @@ public class MainController {
 
     @FXML
     private CheckBox chkFilterActive;
+
+    @FXML
+    private TextField txtFilterSearch;
 
     // TODO: Activar la busqueda de lo descargado
     // TODO: Agregar funcionalidad con qBittorrent y Transmission/Deluge solo para agregar basarse en: tympanix / Electorrent
@@ -178,8 +187,9 @@ public class MainController {
 
         mapColumnsFilters();
         mapColumnsRssItems();
-        listerCheckboxItemsDownload();
-        listerCheckboxActiveFilter();
+        //listerCheckboxItemsDownload();
+        //listerCheckboxActiveFilter();
+        listerTxtSerachItems();
 
     }
 
@@ -392,6 +402,30 @@ public class MainController {
         }
     }
 
+    @FXML
+    void handleCheckDownloaded(ActionEvent event) {
+        //System.out.println("com.grupoad3.flexfx.controller.MainController.handleCheckDownloaded()");
+        searchItemsByFilter();
+    }
+
+    @FXML
+    void handleCheckActive(ActionEvent event) {
+        if (rssSelected == null) {
+            return;
+        }
+
+        MediaFilterService filterService = new MediaFilterService();
+        List<MediaFilters> filters;
+
+        if (chkFilterActive.isSelected()) {
+            filters = filterService.getAllActiveByRss(rssSelected);
+        } else {
+            filters = filterService.getLastItemsByRss(rssSelected, 50, 0);
+        }
+
+        mainApp.getMediaFiltersData().setAll(filters);
+    }
+
     public boolean isConfirmDeletion() {
 
         AlertIcon alert = new AlertIcon(Alert.AlertType.CONFIRMATION);
@@ -500,47 +534,46 @@ public class MainController {
         chkFilterActive.setDisable(false);
         chkFilterActive.setSelected(false);
 
+        txtItemsSearch.setDisable(false);
+
+    }
+    
+
+    private void listerTxtSerachItems() {
+        txtItemsSearch.setOnKeyPressed((event) -> {
+            if (event.getCode().equals(KeyCode.ENTER)) {
+                searchItemsByFilter();
+            }
+        });
+
+        txtItemsSearch.setOnAction((event) -> {
+            System.out.println("----- Prevent default ENTER -------");
+        });
+
     }
 
-    private void listerCheckboxItemsDownload() {
-        chkItemsDownloaded.selectedProperty().addListener((observable, oldValue, isChecked) -> {
+    private synchronized void searchItemsByFilter() {
+        if (rssSelected == null) {
+            return;
+        }
 
-            if (rssSelected == null) {
-                return;
-            }
+        RssItems itemFilter = new RssItems();
+        List<RssItems> items;
+        
+        
+        // Set filter
+        RssItemService itemService = new RssItemService();        
+        if (chkItemsDownloaded.isSelected()) {
+            itemFilter.setStatus(ItemStatus.DOWNLOADED);
+        }
+        itemFilter.setTitle(txtItemsSearch.getText());
 
-            // Para evitar el error de los colores multiples
-            //tableRssItems.getItems().clear();
-            RssItemService itemService = new RssItemService();
-            List<RssItems> items;
-            if (isChecked) {
-                items = itemService.getLastItemsDownloadedByRss(rssSelected);
-            } else {
-                items = itemService.getLastAlltemsByRss(rssSelected, 100, 0, false);
+        // Search BD
+        items = itemService.getAllItemsByFilter(rssSelected, itemFilter);
 
-            }
-            mainApp.getRssItemsData().setAll(items);
-        });
-    }
+        // Set data
+        mainApp.getRssItemsData().setAll(items);
 
-    private void listerCheckboxActiveFilter() {
-        chkFilterActive.selectedProperty().addListener((observable, oldValue, isChecked) -> {
-            if (rssSelected == null) {
-                return;
-            }
-
-            MediaFilterService filterService = new MediaFilterService();
-            List<MediaFilters> filters;
-
-            if (isChecked) {
-                filters = filterService.getAllActiveByRss(rssSelected);
-            } else {
-                filters = filterService.getLastItemsByRss(rssSelected, 50, 0);
-            }
-
-            mainApp.getMediaFiltersData().setAll(filters);
-
-        });
     }
 
 }

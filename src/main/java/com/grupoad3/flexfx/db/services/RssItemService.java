@@ -10,6 +10,7 @@ import com.grupoad3.flexfx.db.model.ItemStatus;
 import com.grupoad3.flexfx.db.model.Rss;
 import com.grupoad3.flexfx.db.model.RssItems;
 import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.stmt.Where;
 import java.io.IOException;
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class RssItemService extends AbstractDaoService<RssItems> {
         super(RssItems.class);
     }
 
-    public List<RssItems> getLastItems(long limit, long offset, boolean withDeleted) throws IOException {
+    /*public List<RssItems> getLastItems(long limit, long offset, boolean withDeleted) throws IOException {
 
         // return all with deleted
         if (withDeleted) {
@@ -51,13 +52,12 @@ public class RssItemService extends AbstractDaoService<RssItems> {
         }
 
         return null;
-    }
+    }*/
 
     // getLastRssNotDeleted
-    public List<RssItems> getLastItemsDownloadedByRss(Rss rss) {
+    /*public List<RssItems> getLastItemsDownloadedByRss(Rss rss) {
         try {
             QueryBuilder builder = dao.queryBuilder();
-
 
             builder.limit(50l);
             builder.offset(0l);
@@ -68,6 +68,37 @@ public class RssItemService extends AbstractDaoService<RssItems> {
                     .eq(RssItems.DELETED_FIELD_NAME, false)
                     .and()
                     .eq(RssItems.ID_RSS_FIELD_NAME, rss.getId());
+
+            builder.orderBy(RssItems.DATE_PUB_FIELD_NAME, false);
+
+            return builder.query();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }*/
+
+    public List<RssItems> getAllItemsByFilter(Rss rss, RssItems itemFilter) {
+        try {
+            QueryBuilder builder = dao.queryBuilder();
+
+            builder.limit(50l);
+            builder.offset(0l);
+
+            Where where = builder.where();
+            where.eq(RssItems.DELETED_FIELD_NAME, false)
+                    .and()
+                    .eq(RssItems.ID_RSS_FIELD_NAME, rss.getId());
+
+            if (itemFilter.getTitle() != null && itemFilter.getTitle().isEmpty() == false) {
+                where.and().like(RssItems.TITLE_FIELD_NAME, "%" + itemFilter.getTitle().trim() + "%");
+            }
+
+            if (itemFilter.getStatus() != null && itemFilter.getStatus().equals(ItemStatus.DOWNLOADED.toString())) {
+                where.and().eq(RssItems.STATUS_FIELD_NAME, ItemStatus.DOWNLOADED);
+            }
 
             builder.orderBy(RssItems.DATE_PUB_FIELD_NAME, false);
 
