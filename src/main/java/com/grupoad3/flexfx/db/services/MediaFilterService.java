@@ -10,7 +10,7 @@ import com.grupoad3.flexfx.db.model.MediaFilters;
 import com.grupoad3.flexfx.db.model.Rss;
 import com.grupoad3.flexfx.db.model.RssItems;
 import com.j256.ormlite.stmt.QueryBuilder;
-import java.io.IOException;
+import com.j256.ormlite.stmt.Where;
 import java.util.List;
 
 /**
@@ -24,7 +24,7 @@ public class MediaFilterService extends AbstractDaoService<MediaFilters> {
         super(MediaFilters.class);
     }
 
-    public List<MediaFilters> getLast(long limit, long offset, boolean withDeleted) throws IOException {
+    /*public List<MediaFilters> getLast(long limit, long offset, boolean withDeleted) throws IOException {
 
         // return all with deleted
         if (withDeleted) {
@@ -50,7 +50,7 @@ public class MediaFilterService extends AbstractDaoService<MediaFilters> {
         }
 
         return null;
-    }
+    }*/
 
     public List<MediaFilters> getLastItemsByRss(Rss rss, long limit, long offset) {
         try {
@@ -89,5 +89,32 @@ public class MediaFilterService extends AbstractDaoService<MediaFilters> {
 
         return null;
     }
+
+    public List<MediaFilters> getAllActiveByFilter(Rss rss, MediaFilters filter) {
+        try {
+            QueryBuilder builder = dao.queryBuilder();
+            builder.limit(50l);
+
+            Where where = builder.where();
+            where.eq(MediaFilters.RSS_ID_FIELD_NAME, rss.getId());
+
+            if(filter.getActive()){
+                where.and().eq(MediaFilters.ACTIVE_FIELD_NAME, true);
+            }
+
+
+            if(filter.getTitle() != null && filter.getTitle().isEmpty() == false){
+                where.and().like(MediaFilters.TITLE_FIELD_NAME, "%" + filter.getTitle().trim() +"%");
+            }
+
+            return builder.query();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
 
 }

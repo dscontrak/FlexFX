@@ -20,6 +20,7 @@ import com.grupoad3.flexfx.ui.TableCellMediaFilterColorActive;
 import com.grupoad3.flexfx.ui.TableCellRssItemColorStatus;
 import com.grupoad3.flexfx.ui.TableCellRssItemDateHuman;
 import com.grupoad3.flexfx.util.ConvertionUtil;
+import com.grupoad3.flexfx.util.OpenFile;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -96,6 +97,9 @@ public class MainController {
     @FXML
     private TextField txtItemsSearch;
 
+    @FXML
+    private Button btnRssItemOpen;
+
     // ------ Media filter section --------------
     @FXML
     private TableView<MediaFilters> tableFilters;
@@ -130,7 +134,8 @@ public class MainController {
     @FXML
     private TextField txtFilterSearch;
 
-    // TODO: Activar la busqueda de lo descargado
+
+    // TODO: Agregar la fucionalidas para descargar de nuevo el archivo
     // TODO: Agregar funcionalidad con qBittorrent y Transmission/Deluge solo para agregar basarse en: tympanix / Electorrent
     // TODO: Agregar tooltip y acceso directo por el teclado
     // ---- Future
@@ -141,6 +146,7 @@ public class MainController {
     private MainApp mainApp;
     private Rss rssSelected;
     private MediaFilters filterSelected;
+    private RssItems rssItemSelected;
 
     ServiceRssItemsTask serviceRssItemsService;
 
@@ -182,6 +188,10 @@ public class MainController {
             filterSelected = newValue;
         }));
 
+        tableRssItems.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            rssItemSelected = newValue;
+        });
+
         hboxProgress.setVisible(false);
         serviceRssItemsService = new ServiceRssItemsTask();
 
@@ -189,7 +199,8 @@ public class MainController {
         mapColumnsRssItems();
         //listerCheckboxItemsDownload();
         //listerCheckboxActiveFilter();
-        listerTxtSerachItems();
+        listenerTxtSearchItems();
+        listenerTxtSearchFilters();
 
     }
 
@@ -410,20 +421,7 @@ public class MainController {
 
     @FXML
     void handleCheckActive(ActionEvent event) {
-        if (rssSelected == null) {
-            return;
-        }
-
-        MediaFilterService filterService = new MediaFilterService();
-        List<MediaFilters> filters;
-
-        if (chkFilterActive.isSelected()) {
-            filters = filterService.getAllActiveByRss(rssSelected);
-        } else {
-            filters = filterService.getLastItemsByRss(rssSelected, 50, 0);
-        }
-
-        mainApp.getMediaFiltersData().setAll(filters);
+        searchMediafilterbyFilter();
     }
 
     public boolean isConfirmDeletion() {
@@ -535,11 +533,13 @@ public class MainController {
         chkFilterActive.setSelected(false);
 
         txtItemsSearch.setDisable(false);
+        txtFilterSearch.setDisable(false);
+
+        btnRssItemOpen.setDisable(false);
 
     }
-    
 
-    private void listerTxtSerachItems() {
+    private void listenerTxtSearchItems() {
         txtItemsSearch.setOnKeyPressed((event) -> {
             if (event.getCode().equals(KeyCode.ENTER)) {
                 searchItemsByFilter();
@@ -552,6 +552,23 @@ public class MainController {
 
     }
 
+    private synchronized void searchMediafilterbyFilter() {
+        if (rssSelected == null) {
+            return;
+        }
+
+        MediaFilterService filterService = new MediaFilterService();
+        List<MediaFilters> filters;
+
+        MediaFilters filterSearch = new MediaFilters();
+        filterSearch.setActive(chkFilterActive.isSelected());
+        filterSearch.setTitle(txtFilterSearch.getText());
+
+        filters = filterService.getAllActiveByFilter(rssSelected, filterSearch);
+
+        mainApp.getMediaFiltersData().setAll(filters);
+    }
+
     private synchronized void searchItemsByFilter() {
         if (rssSelected == null) {
             return;
@@ -559,10 +576,9 @@ public class MainController {
 
         RssItems itemFilter = new RssItems();
         List<RssItems> items;
-        
-        
+
         // Set filter
-        RssItemService itemService = new RssItemService();        
+        RssItemService itemService = new RssItemService();
         if (chkItemsDownloaded.isSelected()) {
             itemFilter.setStatus(ItemStatus.DOWNLOADED);
         }
@@ -573,6 +589,53 @@ public class MainController {
 
         // Set data
         mainApp.getRssItemsData().setAll(items);
+
+    }
+
+    private void listenerTxtSearchFilters() {
+        txtFilterSearch.setOnKeyPressed((event) -> {
+            if (event.getCode().equals(KeyCode.ENTER)) {
+                searchMediafilterbyFilter();
+            }
+        });
+
+        txtFilterSearch.setOnAction((event) -> {
+            System.out.println("----- Prevent default ENTER -------");
+        });
+    }
+
+    @FXML
+    void handleRssItemOpen(ActionEvent event) {
+        try {
+            AlertIcon alertIcon = new AlertIcon(Alert.AlertType.WARNING);
+            alertIcon.setIcon(mainApp.getIconoApp());
+            alertIcon.setTitle("Warning!!");
+
+            OpenFile fileOpen;
+
+            if (rssItemSelected == null) {
+                alertIcon.setContentText("Selected one item to open");
+                alertIcon.showAndWait();
+                return;
+            }
+
+            if (rssItemSelected.getFile() == null || rssItemSelected.getFile().isEmpty()) {
+                alertIcon.setContentText("The item selected dont have file to open");
+                alertIcon.showAndWait();
+                return;
+            }
+
+            File file;
+            String directory = ConfigApp.readProperty(ConfigApp.ConfigTypes.FOLDER_DOWNLOAD);
+
+            file = new File(directory + "/" + rssItemSelected.getFile());
+
+            fileOpen = new OpenFile(file);
+            fileOpen.openWithProcess();
+
+        } catch (Exception ex) {
+            mainApp.showAlertWithEx(ex);
+        }
 
     }
 
