@@ -101,6 +101,7 @@ public class RssItemService extends AbstractDaoService<RssItems> {
             }
 
             builder.orderBy(RssItems.DATE_PUB_FIELD_NAME, false);
+                    
 
             return builder.query();
 
@@ -127,7 +128,7 @@ public class RssItemService extends AbstractDaoService<RssItems> {
                     .and()
                     .eq(RssItems.ID_RSS_FIELD_NAME, rss.getId());
 
-            builder.orderBy(RssItems.DATE_PUB_FIELD_NAME, false);
+            builder.orderBy(RssItems.DATE_PUB_FIELD_NAME, false);                    
 
             return builder.query();
 

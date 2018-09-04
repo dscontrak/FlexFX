@@ -134,7 +134,7 @@ public class MainController {
     @FXML
     private TextField txtFilterSearch;
 
-
+    // TODO: Funcionalidad de editar con el doble click para Rss y Rss item.
     // TODO: Agregar la fucionalidas para descargar de nuevo el archivo
     // TODO: Agregar funcionalidad con qBittorrent y Transmission/Deluge solo para agregar basarse en: tympanix / Electorrent
     // TODO: Agregar tooltip y acceso directo por el teclado
@@ -201,6 +201,7 @@ public class MainController {
         //listerCheckboxActiveFilter();
         listenerTxtSearchItems();
         listenerTxtSearchFilters();
+        listenerRowItemDoubleClick();
 
     }
 
@@ -564,7 +565,7 @@ public class MainController {
         filterSearch.setActive(chkFilterActive.isSelected());
         filterSearch.setTitle(txtFilterSearch.getText());
 
-        filters = filterService.getAllActiveByFilter(rssSelected, filterSearch);
+        filters = filterService.getAllByFilter(rssSelected, filterSearch);
 
         mainApp.getMediaFiltersData().setAll(filters);
     }
@@ -606,6 +607,10 @@ public class MainController {
 
     @FXML
     void handleRssItemOpen(ActionEvent event) {
+        openFileItemSelected(rssItemSelected);
+    }
+    
+    private synchronized void openFileItemSelected(RssItems item){
         try {
             AlertIcon alertIcon = new AlertIcon(Alert.AlertType.WARNING);
             alertIcon.setIcon(mainApp.getIconoApp());
@@ -613,13 +618,13 @@ public class MainController {
 
             OpenFile fileOpen;
 
-            if (rssItemSelected == null) {
+            if (item == null) {
                 alertIcon.setContentText("Selected one item to open");
                 alertIcon.showAndWait();
                 return;
             }
 
-            if (rssItemSelected.getFile() == null || rssItemSelected.getFile().isEmpty()) {
+            if (item.getFile() == null || item.getFile().isEmpty()) {
                 alertIcon.setContentText("The item selected dont have file to open");
                 alertIcon.showAndWait();
                 return;
@@ -628,7 +633,7 @@ public class MainController {
             File file;
             String directory = ConfigApp.readProperty(ConfigApp.ConfigTypes.FOLDER_DOWNLOAD);
 
-            file = new File(directory + "/" + rssItemSelected.getFile());
+            file = new File(directory + "/" + item.getFile());
 
             fileOpen = new OpenFile(file);
             fileOpen.openWithProcess();
@@ -636,7 +641,17 @@ public class MainController {
         } catch (Exception ex) {
             mainApp.showAlertWithEx(ex);
         }
+    }
 
+    private void listenerRowItemDoubleClick() {
+        
+        tableRssItems.setOnMouseClicked((event) -> {
+            if (event.getClickCount() == 2) {
+                //RssItems itemCliked = row.getItem();                
+                RssItems item = tableRssItems.getSelectionModel().getSelectedItem();
+                openFileItemSelected(item);                                
+            }
+        });
     }
 
 }

@@ -18,7 +18,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="600.0" maxWidth="900.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.181" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.grupoad3.flexfx.controller.MainController">
+<BorderPane maxHeight="600.0" maxWidth="900.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.grupoad3.flexfx.controller.MainController">
    <center>
       <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
          <children>
@@ -81,17 +81,22 @@
                   </TableView>
                   <HBox alignment="CENTER_LEFT" maxHeight="40.0" prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
                      <children>
-                        <Button fx:id="btnRssItemOpen" alignment="TOP_LEFT" disable="true" mnemonicParsing="false" onAction="#handleRssItemOpen" text="Open torrent">
+                        <Label text="File item: ">
+                           <HBox.margin>
+                              <Insets right="10.0" />
+                           </HBox.margin>
+                        </Label>
+                        <Button fx:id="btnRssItemOpen" alignment="TOP_LEFT" disable="true" mnemonicParsing="false" onAction="#handleRssItemOpen" text="Open">
                            <graphic>
-                              <FontAwesomeIconView glyphName="FILE" />
+                              <FontAwesomeIconView glyphName="FOLDER_OPEN" />
                            </graphic>
                            <HBox.margin>
                               <Insets bottom="5.0" right="5.0" top="5.0" />
                            </HBox.margin>
                         </Button>
-                        <Button alignment="TOP_LEFT" disable="true" mnemonicParsing="false" text="Get torrent">
+                        <Button alignment="TOP_LEFT" disable="true" mnemonicParsing="false" text="Download ">
                            <graphic>
-                              <FontAwesomeIconView glyphName="FILE" />
+                              <FontAwesomeIconView glyphName="DOWNLOAD" />
                            </graphic>
                         </Button>
                      </children>
@@ -186,7 +191,7 @@
                <children>
                   <Button defaultButton="true" mnemonicParsing="false" onAction="#handleRssDownload">
                      <graphic>
-                        <FontAwesomeIconView glyphName="DOWNLOAD" />
+                        <FontAwesomeIconView glyphName="ARROW_DOWN" />
                      </graphic>
                      <HBox.margin>
                         <Insets left="5.0" />
