@@ -39,7 +39,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
 
 /**
@@ -71,6 +74,12 @@ public class MainController {
 
     @FXML
     private Label lblProgress;
+    
+    @FXML
+    private Button btnRssDownload;
+    
+    @FXML
+    private Button btnRssConfig;
 
     // -------- Rss item section --------
     @FXML
@@ -134,10 +143,8 @@ public class MainController {
     @FXML
     private TextField txtFilterSearch;
 
-    // TODO: Funcionalidad de editar con el doble click para Rss y Rss item.
     // TODO: Agregar la fucionalidas para descargar de nuevo el archivo
-    // TODO: Agregar funcionalidad con qBittorrent y Transmission/Deluge solo para agregar basarse en: tympanix / Electorrent
-    // TODO: Agregar tooltip y acceso directo por el teclado
+    // TODO: Agregar funcionalidad con qBittorrent y Transmission/Deluge solo para agregar basarse en: tympanix / Electorrent    
     // ---- Future
     // TODO: Poner el proceso de carga debajo del boton de descarga
     // TODO: Poner la funcionalidad del media filter con los archivos descargdos relacionados
@@ -165,6 +172,8 @@ public class MainController {
         tableRss.setItems(mainApp.getRssData());
         tableFilters.setItems(mainApp.getMediaFiltersData());
         tableRssItems.setItems(mainApp.getRssItemsData());
+        
+        setShortCuts();
 
     }
 
@@ -202,6 +211,11 @@ public class MainController {
         listenerTxtSearchItems();
         listenerTxtSearchFilters();
         listenerRowItemDoubleClick();
+        listenerRowRssDoubleClick();
+        listernerRowFilterDoubleClick();
+        
+        setTooltips();
+        
 
     }
 
@@ -643,15 +657,70 @@ public class MainController {
         }
     }
 
-    private void listenerRowItemDoubleClick() {
-        
+    private void listenerRowItemDoubleClick() {        
         tableRssItems.setOnMouseClicked((event) -> {
-            if (event.getClickCount() == 2) {
-                //RssItems itemCliked = row.getItem();                
+            if (event.getClickCount() == 2) {                
                 RssItems item = tableRssItems.getSelectionModel().getSelectedItem();
                 openFileItemSelected(item);                                
             }
         });
+    }
+
+    private void listenerRowRssDoubleClick() {
+        
+        tableRss.setOnMouseClicked((event) -> {
+            if (event.getClickCount() == 2) {                
+                handleRssEdit(null);
+            }
+        });
+        
+    }
+
+    private void listernerRowFilterDoubleClick() {
+        handleMediaFilterEdit(null);
+        
+        tableFilters.setOnMouseClicked((event) -> {
+            if (event.getClickCount() == 2) {                
+                handleMediaFilterEdit(null);
+            }
+        });
+    }
+
+    private void setTooltips() {
+        final Tooltip tipBtnRssDownload = new Tooltip();   
+        final Tooltip tipBtnRssConfig = new Tooltip();
+        
+        // set text        
+        tipBtnRssDownload.setText("Syncronize Rss and Download files \nfrom RSS (Ctrl+S)");        
+        tipBtnRssConfig.setText("Preferences (Ctrl+P)");        
+        
+        // bind with control
+        btnRssDownload.setTooltip(tipBtnRssDownload);
+        btnRssConfig.setTooltip(tipBtnRssConfig);
+        
+        
+    }
+
+    private void setShortCuts() {
+        
+        if(mainApp == null || mainApp.getPrimaryStage() == null || mainApp.getPrimaryStage().getScene() == null){
+            return;
+        }
+        
+        // Combination
+        KeyCombination kcDonwload = new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_ANY);
+        KeyCombination kcConfig = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_ANY);
+        
+        // Run on shorcut
+        Runnable runDownload = () -> handleRssDownload(null);
+        Runnable runConfig = () -> handleConfig(null);
+        
+        // Set shortcut to run
+        mainApp.getPrimaryStage().getScene().getAccelerators().put(kcDonwload, runDownload);
+        mainApp.getPrimaryStage().getScene().getAccelerators().put(kcConfig, runConfig);
+        
+        
+        
     }
 
 }

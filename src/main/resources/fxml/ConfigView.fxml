@@ -168,7 +168,7 @@
       </GridPane>
       <HBox alignment="CENTER_RIGHT" prefHeight="40.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <children>
-            <Button mnemonicParsing="false" onAction="#handleCancel" prefWidth="80.0" text="Cancel">
+            <Button cancelButton="true" mnemonicParsing="false" onAction="#handleCancel" prefWidth="80.0" text="Cancel">
                <HBox.margin>
                   <Insets right="10.0" />
                </HBox.margin>

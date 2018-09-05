@@ -220,6 +220,7 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
 
                 } catch (IOException e) {
                     e.printStackTrace();
+                    throw e;
                 }
 
                 return new ArrayList<>(itemsToAdd);

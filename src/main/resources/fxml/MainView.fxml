@@ -189,7 +189,7 @@
             </Label>
             <HBox alignment="CENTER" layoutX="92.0" layoutY="-2.0" prefHeight="37.0" prefWidth="95.0" AnchorPane.leftAnchor="92.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
                <children>
-                  <Button defaultButton="true" mnemonicParsing="false" onAction="#handleRssDownload">
+                  <Button fx:id="btnRssDownload" defaultButton="true" mnemonicParsing="false" onAction="#handleRssDownload">
                      <graphic>
                         <FontAwesomeIconView glyphName="ARROW_DOWN" />
                      </graphic>
@@ -200,7 +200,7 @@
                         <Font size="14.0" />
                      </font>
                   </Button>
-                  <Button mnemonicParsing="false" onAction="#handleConfig">
+                  <Button fx:id="btnRssConfig" mnemonicParsing="false" onAction="#handleConfig">
                      <graphic>
                         <FontAwesomeIconView glyphName="COG" size="12" />
                      </graphic>
