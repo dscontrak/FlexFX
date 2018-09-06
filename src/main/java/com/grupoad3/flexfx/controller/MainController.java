@@ -149,6 +149,7 @@ public class MainController {
     // TODO: Poner el proceso de carga debajo del boton de descarga
     // TODO: Poner la funcionalidad del media filter con los archivos descargdos relacionados
     // TODO: Obtener información de API de algun lado del titulo
+    
     // Reference to the main application.
     private MainApp mainApp;
     private Rss rssSelected;
