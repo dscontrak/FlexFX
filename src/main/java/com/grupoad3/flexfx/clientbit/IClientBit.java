@@ -23,11 +23,11 @@ public interface IClientBit {
     
     /**
      * Add url to download by bittorrent client
-     * @param file
+     * @param url
      * @return 
      * @throws java.lang.Exception 
      */
-    public String addTorrent(URL file) throws Exception;    
+    public String addTorrent(URL url) throws Exception;    
     
     /**
      * If is necesary login and set session data

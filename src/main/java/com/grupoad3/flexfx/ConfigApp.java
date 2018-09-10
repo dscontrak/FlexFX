@@ -31,7 +31,7 @@ public class ConfigApp {
         PROXY_HOST("app.proxy.host", "10.10.10.10"),
         PROXY_PORT("app.proxy.port", "1000"),
         
-        CLIENTTORR_USE("torrent.client.host", "false"),
+        CLIENTTORR_USE("torrent.client.use", "false"),
         CLIENTTORR_HOST("torrent.client.host", "127.0.0.1"),
         CLIENTTORR_PORT("torrent.client.port", "80"),
         CLIENTTORR_USER("torrent.client.user", "user"),

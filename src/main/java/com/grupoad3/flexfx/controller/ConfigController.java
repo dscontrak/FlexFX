@@ -179,18 +179,22 @@ public class ConfigController {
 
             valuesProperties.put(ConfigApp.ConfigTypes.FOLDER_DOWNLOAD.nameProp(), txtDownFolder.getText());
 
-            valuesProperties.put(ConfigApp.ConfigTypes.CLIENTTORR_APP.nameProp(), cbxClientApp.getValue().toString());
+            valuesProperties.put(ConfigApp.ConfigTypes.CLIENTTORR_APP.nameProp(),  cbxClientApp.getValue().toString());
             valuesProperties.put(ConfigApp.ConfigTypes.CLIENTTORR_HOST.nameProp(), txtClientHost.getText());
             valuesProperties.put(ConfigApp.ConfigTypes.CLIENTTORR_PASS.nameProp(), txtClientPass.getText());
-            valuesProperties.put(ConfigApp.ConfigTypes.CLIENTTORR_PORT.nameProp(), txtClientPort.getText());
-            //values.put(ConfigApp.ConfigTypes.CLIENTTORR_USE.nameProp(), txtDownFolder.getText());
+            valuesProperties.put(ConfigApp.ConfigTypes.CLIENTTORR_PORT.nameProp(), txtClientPort.getText());            
             valuesProperties.put(ConfigApp.ConfigTypes.CLIENTTORR_USER.nameProp(), txtClientUser.getText());
-
+            valuesProperties.put(ConfigApp.ConfigTypes.CLIENTTORR_USE.nameProp(),  rbnClientActive.isSelected() ? "true":"false" );
+            
+                        
             valuesProperties.put(ConfigApp.ConfigTypes.PROXY_HOST.nameProp(), txtProxyHost.getText());
             valuesProperties.put(ConfigApp.ConfigTypes.PROXY_PORT.nameProp(), txtProxyPort.getText());
+            valuesProperties.put(ConfigApp.ConfigTypes.PROXY_USE.nameProp(),  rbnProxyActive.isSelected() ? "true":"false" );
 
             configApp.writeAllProperties(valuesProperties);
             configApp.loadProperties();
+            
+            dialogStage.close();
 
         } catch (IOException ex) {
             mainApp.showAlertWithEx(ex);

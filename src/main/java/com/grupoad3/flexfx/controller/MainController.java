@@ -25,10 +25,13 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -36,6 +39,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -108,6 +112,12 @@ public class MainController {
 
     @FXML
     private Button btnRssItemOpen;
+    
+    @FXML
+    private Button btnRssItemOpenClient;
+
+    @FXML
+    private Button btnRssItemLinkClient;
 
     // ------ Media filter section --------------
     @FXML
@@ -143,7 +153,7 @@ public class MainController {
     @FXML
     private TextField txtFilterSearch;
 
-    // TODO: Agregar la fucionalidas para descargar de nuevo el archivo
+    // TODO: Agregar la fucionalidas para descargar de nuevo el archivo con multiseleccion
     // TODO: Agregar funcionalidad con qBittorrent y Transmission/Deluge solo para agregar basarse en: tympanix / Electorrent    
     // ---- Future
     // TODO: Poner el proceso de carga debajo del boton de descarga
@@ -154,8 +164,10 @@ public class MainController {
     private MainApp mainApp;
     private Rss rssSelected;
     private MediaFilters filterSelected;
-    private RssItems rssItemSelected;
-
+    private RssItems rssLastItemSelected;
+    
+    private HashSet<RssItems> rssAllSelected = new HashSet<>();
+    
     ServiceRssItemsTask serviceRssItemsService;
 
     /*@Override
@@ -190,17 +202,7 @@ public class MainController {
         // Listener to selected element of list
         showRssDetails(null);
 
-        tableRss.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            showRssDetails(newValue);
-        });
-
-        tableFilters.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
-            filterSelected = newValue;
-        }));
-
-        tableRssItems.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            rssItemSelected = newValue;
-        });
+        listenerSelectionTables();
 
         hboxProgress.setVisible(false);
         serviceRssItemsService = new ServiceRssItemsTask();
@@ -214,6 +216,8 @@ public class MainController {
         listenerRowItemDoubleClick();
         listenerRowRssDoubleClick();
         listernerRowFilterDoubleClick();
+        
+        
         
         setTooltips();
         
@@ -552,6 +556,16 @@ public class MainController {
         txtFilterSearch.setDisable(false);
 
         btnRssItemOpen.setDisable(false);
+        
+        try {
+            if(ConfigApp.readProperty(ConfigApp.ConfigTypes.CLIENTTORR_USE).equals("true")){
+                btnRssItemLinkClient.setDisable(false);
+                btnRssItemOpenClient.setDisable(false);
+            }
+        } catch (Exception ex) {
+            mainApp.showAlertWithEx(ex);
+        }
+        
 
     }
 
@@ -622,7 +636,25 @@ public class MainController {
 
     @FXML
     void handleRssItemOpen(ActionEvent event) {
-        openFileItemSelected(rssItemSelected);
+        if(rssAllSelected.isEmpty()){
+            return;
+        }
+        if(rssAllSelected.size() == 1){
+            openFileItemSelected(rssLastItemSelected);
+        }else{
+            openFileItemSelected(new ArrayList<>(rssAllSelected));
+        }
+        
+    }
+    
+    @FXML
+    void handleRssItemOpenClient(ActionEvent event) {
+        System.out.println("com.grupoad3.flexfx.controller.MainController.handleRssItemOpenClient()");
+    }
+    
+     @FXML
+    void handleRssItemLinkClient(ActionEvent event) {
+         System.out.println("com.grupoad3.flexfx.controller.MainController.handleRssItemLinkClient()");
     }
     
     private synchronized void openFileItemSelected(RssItems item){
@@ -652,6 +684,41 @@ public class MainController {
 
             fileOpen = new OpenFile(file);
             fileOpen.openWithProcess();
+
+        } catch (Exception ex) {
+            mainApp.showAlertWithEx(ex);
+        }
+    }
+    
+    private synchronized void openFileItemSelected(List<RssItems> items){
+        try {
+            AlertIcon alertIcon = new AlertIcon(Alert.AlertType.WARNING);
+            alertIcon.setIcon(mainApp.getIconoApp());
+            alertIcon.setTitle("Warning!!");
+
+            OpenFile fileOpen;
+
+            if (items == null || items.isEmpty()) {
+                alertIcon.setContentText("Selected items to open");
+                alertIcon.showAndWait();
+                return;
+            }
+
+            /*if (item.getFile() == null || item.getFile().isEmpty()) {
+                alertIcon.setContentText("The item selected dont have file to open");
+                alertIcon.showAndWait();
+                return;
+            }*/
+
+            File file;
+            String directory = ConfigApp.readProperty(ConfigApp.ConfigTypes.FOLDER_DOWNLOAD);
+            for (RssItems rssItems : items) {
+                file = new File(directory + "/" + rssItems.getFile());
+
+                fileOpen = new OpenFile(file);
+                fileOpen.openWithProcess();
+            }
+            
 
         } catch (Exception ex) {
             mainApp.showAlertWithEx(ex);
@@ -722,6 +789,28 @@ public class MainController {
         
         
         
+    }
+
+    private void listenerSelectionTables() {
+        tableRss.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            showRssDetails(newValue);
+        });
+
+        tableFilters.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
+            filterSelected = newValue;
+        }));
+        
+        tableRssItems.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        tableRssItems.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            rssLastItemSelected = newValue;           
+        });
+        tableRssItems.setOnMouseReleased((event) -> {
+            ObservableList<RssItems> selectedItems = tableRssItems.getSelectionModel().getSelectedItems();
+            rssAllSelected.clear();
+            for (RssItems selectedItem : selectedItems) {
+                rssAllSelected.add(selectedItem);
+            }
+        });
     }
 
 }

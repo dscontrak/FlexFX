@@ -85,7 +85,7 @@ public class Qbittorrent41 extends ClientBittorrent {
     }
 
     @Override
-    public String addTorrent(URL file) {
+    public String addTorrent(URL url) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

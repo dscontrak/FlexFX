@@ -10,7 +10,7 @@ package com.grupoad3.flexfx.db.model;
  * @author daniel
  */
 public enum ClientAppTorrentType {
-    QBITTORRENT4_1,
-    QBITTORRENT3_2,
-    TRANSMISSION
+    QBITTORRENT41,
+    QBITTORRENT32,
+    //TRANSMISSION
 }

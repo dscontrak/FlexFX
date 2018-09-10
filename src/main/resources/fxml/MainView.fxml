@@ -81,9 +81,9 @@
                   </TableView>
                   <HBox alignment="CENTER_LEFT" maxHeight="40.0" prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
                      <children>
-                        <Label text="File item: ">
+                        <Label text="Torrent File : ">
                            <HBox.margin>
-                              <Insets right="10.0" />
+                              <Insets right="5.0" />
                            </HBox.margin>
                         </Label>
                         <Button fx:id="btnRssItemOpen" alignment="TOP_LEFT" disable="true" mnemonicParsing="false" onAction="#handleRssItemOpen" text="Open">
@@ -97,6 +97,27 @@
                         <Button alignment="TOP_LEFT" disable="true" mnemonicParsing="false" text="Download ">
                            <graphic>
                               <FontAwesomeIconView glyphName="DOWNLOAD" />
+                           </graphic>
+                           <HBox.margin>
+                              <Insets right="20.0" />
+                           </HBox.margin>
+                        </Button>
+                        <Label text="Torrent Client: ">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Label>
+                        <Button fx:id="btnRssItemOpenClient" alignment="TOP_LEFT" disable="true" mnemonicParsing="false" onAction="#handleRssItemOpenClient" text="Send file">
+                           <graphic>
+                              <FontAwesomeIconView glyphName="FILE" />
+                           </graphic>
+                           <HBox.margin>
+                              <Insets right="5.0" />
+                           </HBox.margin>
+                        </Button>
+                        <Button fx:id="btnRssItemLinkClient" alignment="TOP_LEFT" disable="true" mnemonicParsing="false" onAction="#handleRssItemLinkClient" text="Send link">
+                           <graphic>
+                              <FontAwesomeIconView glyphName="LINK" />
                            </graphic>
                         </Button>
                      </children>
