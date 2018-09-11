@@ -32,6 +32,8 @@ import org.apache.http.message.BasicNameValuePair;
  * @author daniel_serna
  */
 public class Qbittorrent41 extends ClientBittorrent {
+    
+    private final String apiLogin = "/api/v2/auth/login";
 
     public Qbittorrent41(String url) {
         super(url);
@@ -68,6 +70,7 @@ public class Qbittorrent41 extends ClientBittorrent {
             if (pathToSave != null && pathToSave.isEmpty() == false) {
                 builder.addTextBody("savepath", pathToSave);
             }
+            builder.addTextBody("paused", "true"); // Add in pause state
             HttpEntity multipart = builder.build();
             httpPost.setEntity(multipart);
             
@@ -94,7 +97,7 @@ public class Qbittorrent41 extends ClientBittorrent {
         // Info: https://www.mkyong.com/java/apache-httpclient-examples/
 
         HttpClient client = HttpClientBuilder.create().build();
-        HttpPost post = new HttpPost(url);
+        HttpPost post = new HttpPost(url + apiLogin);
 
         // add header
         post.setHeader("User-Agent", USER_AGENT);

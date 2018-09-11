@@ -19,7 +19,7 @@ public abstract class ClientBittorrent implements IClientBit{
     
 
     public ClientBittorrent(String url) {        
-        this.url = pass;
+        this.url = url;
     }    
 
     public String getPathToSave() {

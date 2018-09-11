@@ -127,7 +127,7 @@ public class MediaFilterController {
     }
 
     @FXML
-    private void handleSave(){
+    void handleSave(){
         MediaFilterService filterService;
         InputValidatorHelper validator = isInputValid();
 

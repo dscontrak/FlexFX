@@ -125,7 +125,7 @@
                         <Insets top="10.0" />
                      </HBox.margin>
                   </TextField>
-                  <TextField fx:id="txtClientPort" promptText="Port">
+                  <TextField fx:id="txtClientPort" promptText="Port 80 default">
                      <HBox.margin>
                         <Insets top="10.0" />
                      </HBox.margin>
@@ -135,7 +135,7 @@
                   <Insets right="20.0" />
                </padding>
             </HBox>
-            <Label text="Client torrent credential:" GridPane.rowIndex="5">
+            <Label text="Client torrent credentials:" GridPane.rowIndex="5">
                <padding>
                   <Insets right="20.0" />
                </padding>
