@@ -70,7 +70,7 @@ public class Qbittorrent41 extends ClientBittorrent {
             if (pathToSave != null && pathToSave.isEmpty() == false) {
                 builder.addTextBody("savepath", pathToSave);
             }
-            builder.addTextBody("paused", "true"); // Add in pause state
+            builder.addTextBody("paused", String.valueOf(addPauseState));                       
             HttpEntity multipart = builder.build();
             httpPost.setEntity(multipart);
             

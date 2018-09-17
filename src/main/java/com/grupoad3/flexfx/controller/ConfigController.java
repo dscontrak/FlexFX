@@ -14,15 +14,15 @@ import com.grupoad3.flexfx.ui.AlertIcon;
 import com.grupoad3.flexfx.util.InputValidatorHelper;
 import java.io.IOException;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
@@ -78,13 +78,16 @@ public class ConfigController {
     private TextField txtClientUser;
 
     @FXML
-    private TextField txtClientPass;
+    private PasswordField txtClientPass;
 
     @FXML
     private ComboBox<ClientAppTorrentType> cbxClientApp;
 
     @FXML
     private Button btnTestClient;
+    
+    @FXML
+    private CheckBox chkAddPause;
 
     Map<String, String> valuesProperties;
 
@@ -109,6 +112,7 @@ public class ConfigController {
 
         String useProxy;
         String useClient;
+        String isAddPause;
 
         try {
 
@@ -116,6 +120,7 @@ public class ConfigController {
 
             useProxy = valuesProperties.get(ConfigApp.ConfigTypes.PROXY_USE.nameProp());
             useClient = valuesProperties.get(ConfigApp.ConfigTypes.CLIENTTORR_USE.nameProp());
+            isAddPause = valuesProperties.get(ConfigApp.ConfigTypes.CLIENTTORR_ADD_PAUSE.nameProp());
 
             // Load config
             txtDownFolder.setText(valuesProperties.get(ConfigApp.ConfigTypes.FOLDER_DOWNLOAD.nameProp()));
@@ -140,6 +145,12 @@ public class ConfigController {
                 rbnClientActive.setSelected(true);
             } else {
                 rbnClientInactive.setSelected(true);
+            }
+            
+            if("true".equals(isAddPause)){
+                chkAddPause.setSelected(true);
+            }else{
+                chkAddPause.setSelected(false);
             }
 
             if (rbnClientInactive.isSelected()) {
@@ -174,6 +185,7 @@ public class ConfigController {
         InputValidatorHelper validatorClient = validClientData();
         StringBuilder url = new StringBuilder("http://");
         final String clientSelected = cbxClientApp.getValue().toString();
+        final boolean isAddPause = chkAddPause.isSelected();
 
         final AlertIcon alert = new AlertIcon(Alert.AlertType.WARNING);
         alert.setIcon(mainApp.getIconoApp());
@@ -196,8 +208,9 @@ public class ConfigController {
         try {
 
             if (clientSelected.equals(ClientAppTorrentType.QBITTORRENT41.toString())) {
-
-                cliente = new Qbittorrent41(url.toString());
+                
+                cliente = new Qbittorrent41(url.toString());                
+                cliente.setAddPauseState(isAddPause);
                 cliente.login(txtClientUser.getText(), txtClientPass.getText());
 
             }else{
@@ -239,6 +252,7 @@ public class ConfigController {
             valuesProperties.put(ConfigApp.ConfigTypes.CLIENTTORR_PORT.nameProp(), txtClientPort.getText());
             valuesProperties.put(ConfigApp.ConfigTypes.CLIENTTORR_USER.nameProp(), txtClientUser.getText());
             valuesProperties.put(ConfigApp.ConfigTypes.CLIENTTORR_USE.nameProp(), rbnClientActive.isSelected() ? "true" : "false");
+            valuesProperties.put(ConfigApp.ConfigTypes.CLIENTTORR_ADD_PAUSE.nameProp(), chkAddPause.isSelected() ? "true": "false" );
 
             if (rbnProxyActive.isSelected()) {
 
@@ -252,6 +266,7 @@ public class ConfigController {
             valuesProperties.put(ConfigApp.ConfigTypes.PROXY_HOST.nameProp(), txtProxyHost.getText());
             valuesProperties.put(ConfigApp.ConfigTypes.PROXY_PORT.nameProp(), txtProxyPort.getText());
             valuesProperties.put(ConfigApp.ConfigTypes.PROXY_USE.nameProp(), rbnProxyActive.isSelected() ? "true" : "false");
+            
 
             configApp.writeAllProperties(valuesProperties);
             configApp.loadProperties();
@@ -338,6 +353,7 @@ public class ConfigController {
 
         cbxClientApp.setDisable(inactive);
         btnTestClient.setDisable(inactive);
+        chkAddPause.setDisable(inactive);
 
     }
 

@@ -36,7 +36,8 @@ public class ConfigApp {
         CLIENTTORR_PORT("torrent.client.port", "80"),
         CLIENTTORR_USER("torrent.client.user", "user"),
         CLIENTTORR_PASS("torrent.client.pass", "pass"),
-        CLIENTTORR_APP("torrent.client.app", "QBITTORRENT")
+        CLIENTTORR_APP("torrent.client.app", "QBITTORRENT"),
+        CLIENTTORR_ADD_PAUSE("torrent.client.addpause", "true"),
         ;
 
         private final String nameProperty;

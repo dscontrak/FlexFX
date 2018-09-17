@@ -16,10 +16,12 @@ public abstract class ClientBittorrent implements IClientBit{
     protected String pass;   
     protected String url;
     protected String pathToSave;
+    protected boolean addPauseState;
     
 
     public ClientBittorrent(String url) {        
         this.url = url;
+        addPauseState = true;
     }    
 
     public String getPathToSave() {
@@ -46,7 +48,16 @@ public abstract class ClientBittorrent implements IClientBit{
     public void setPass(String pass) {
         this.pass = pass;
     }
+
+    public boolean isAddPauseState() {
+        return addPauseState;
+    }
+
+    public void setAddPauseState(boolean addPauseState) {
+        this.addPauseState = addPauseState;
+    }
         
+    
         
     /**
      * Erase session data

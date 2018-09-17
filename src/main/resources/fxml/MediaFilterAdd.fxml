@@ -81,7 +81,7 @@
                         <Insets right="20.0" />
                      </GridPane.margin>
                   </ComboBox>
-                  <Label text="Folder to download:" GridPane.rowIndex="5">
+                  <Label text="Folder to download (client torrent):" GridPane.rowIndex="5">
                      <padding>
                         <Insets right="20.0" />
                      </padding>
