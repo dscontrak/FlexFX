@@ -7,6 +7,9 @@ package com.grupoad3.flexfx.controller;
 
 import com.grupoad3.flexfx.ConfigApp;
 import com.grupoad3.flexfx.MainApp;
+import com.grupoad3.flexfx.clientbit.ClientBittorrent;
+import com.grupoad3.flexfx.clientbit.Qbittorrent41;
+import com.grupoad3.flexfx.db.model.ClientAppTorrentType;
 import com.grupoad3.flexfx.db.model.ItemStatus;
 import com.grupoad3.flexfx.db.model.MediaFilters;
 import com.grupoad3.flexfx.db.model.Rss;
@@ -78,10 +81,10 @@ public class MainController {
 
     @FXML
     private Label lblProgress;
-    
+
     @FXML
     private Button btnRssDownload;
-    
+
     @FXML
     private Button btnRssConfig;
 
@@ -112,7 +115,7 @@ public class MainController {
 
     @FXML
     private Button btnRssItemOpen;
-    
+
     @FXML
     private Button btnRssItemOpenClient;
 
@@ -154,20 +157,20 @@ public class MainController {
     private TextField txtFilterSearch;
 
     // TODO: Agregar la fucionalidas para descargar de nuevo el archivo con multiseleccion
-    // TODO: Agregar funcionalidad con qBittorrent y Transmission/Deluge solo para agregar basarse en: tympanix / Electorrent    
+    // TODO: Agregar funcionalidad con qBittorrent y Transmission/Deluge solo para agregar basarse en: tympanix / Electorrent
     // ---- Future
     // TODO: Poner el proceso de carga debajo del boton de descarga
     // TODO: Poner la funcionalidad del media filter con los archivos descargdos relacionados
     // TODO: Obtener información de API de algun lado del titulo
-    
+
     // Reference to the main application.
     private MainApp mainApp;
     private Rss rssSelected;
     private MediaFilters filterSelected;
     private RssItems rssLastItemSelected;
-    
+
     private HashSet<RssItems> rssAllSelected = new HashSet<>();
-    
+
     ServiceRssItemsTask serviceRssItemsService;
 
     /*@Override
@@ -185,7 +188,7 @@ public class MainController {
         tableRss.setItems(mainApp.getRssData());
         tableFilters.setItems(mainApp.getMediaFiltersData());
         tableRssItems.setItems(mainApp.getRssItemsData());
-        
+
         setShortCuts();
 
     }
@@ -216,11 +219,11 @@ public class MainController {
         listenerRowItemDoubleClick();
         listenerRowRssDoubleClick();
         listernerRowFilterDoubleClick();
-        
-        
-        
+
+
+
         setTooltips();
-        
+
 
     }
 
@@ -556,7 +559,7 @@ public class MainController {
         txtFilterSearch.setDisable(false);
 
         btnRssItemOpen.setDisable(false);
-        
+
         try {
             if(ConfigApp.readProperty(ConfigApp.ConfigTypes.CLIENTTORR_USE).equals("true")){
                 btnRssItemLinkClient.setDisable(false);
@@ -565,7 +568,7 @@ public class MainController {
         } catch (Exception ex) {
             mainApp.showAlertWithEx(ex);
         }
-        
+
 
     }
 
@@ -644,19 +647,19 @@ public class MainController {
         }else{
             openFileItemSelected(new ArrayList<>(rssAllSelected));
         }
-        
+
     }
-    
+
     @FXML
     void handleRssItemOpenClient(ActionEvent event) {
-        System.out.println("com.grupoad3.flexfx.controller.MainController.handleRssItemOpenClient()");
+        openFileClientTorrent(rssLastItemSelected);
     }
-    
+
      @FXML
     void handleRssItemLinkClient(ActionEvent event) {
          System.out.println("com.grupoad3.flexfx.controller.MainController.handleRssItemLinkClient()");
     }
-    
+
     private synchronized void openFileItemSelected(RssItems item){
         try {
             AlertIcon alertIcon = new AlertIcon(Alert.AlertType.WARNING);
@@ -689,7 +692,7 @@ public class MainController {
             mainApp.showAlertWithEx(ex);
         }
     }
-    
+
     private synchronized void openFileItemSelected(List<RssItems> items){
         try {
             AlertIcon alertIcon = new AlertIcon(Alert.AlertType.WARNING);
@@ -718,77 +721,77 @@ public class MainController {
                 fileOpen = new OpenFile(file);
                 fileOpen.openWithProcess();
             }
-            
+
 
         } catch (Exception ex) {
             mainApp.showAlertWithEx(ex);
         }
     }
 
-    private void listenerRowItemDoubleClick() {        
+    private void listenerRowItemDoubleClick() {
         tableRssItems.setOnMouseClicked((event) -> {
-            if (event.getClickCount() == 2) {                
+            if (event.getClickCount() == 2) {
                 RssItems item = tableRssItems.getSelectionModel().getSelectedItem();
-                openFileItemSelected(item);                                
+                openFileItemSelected(item);
             }
         });
     }
 
     private void listenerRowRssDoubleClick() {
-        
+
         tableRss.setOnMouseClicked((event) -> {
-            if (event.getClickCount() == 2) {                
+            if (event.getClickCount() == 2) {
                 handleRssEdit(null);
             }
         });
-        
+
     }
 
     private void listernerRowFilterDoubleClick() {
         handleMediaFilterEdit(null);
-        
+
         tableFilters.setOnMouseClicked((event) -> {
-            if (event.getClickCount() == 2) {                
+            if (event.getClickCount() == 2) {
                 handleMediaFilterEdit(null);
             }
         });
     }
 
     private void setTooltips() {
-        final Tooltip tipBtnRssDownload = new Tooltip();   
+        final Tooltip tipBtnRssDownload = new Tooltip();
         final Tooltip tipBtnRssConfig = new Tooltip();
-        
-        // set text        
-        tipBtnRssDownload.setText("Syncronize Rss and Download files \nfrom RSS (Ctrl+S)");        
-        tipBtnRssConfig.setText("Preferences (Ctrl+P)");        
-        
+
+        // set text
+        tipBtnRssDownload.setText("Syncronize Rss and Download files \nfrom RSS (Ctrl+S)");
+        tipBtnRssConfig.setText("Preferences (Ctrl+P)");
+
         // bind with control
         btnRssDownload.setTooltip(tipBtnRssDownload);
         btnRssConfig.setTooltip(tipBtnRssConfig);
-        
-        
+
+
     }
 
     private void setShortCuts() {
-        
+
         if(mainApp == null || mainApp.getPrimaryStage() == null || mainApp.getPrimaryStage().getScene() == null){
             return;
         }
-        
+
         // Combination
         KeyCombination kcDonwload = new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_ANY);
         KeyCombination kcConfig = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_ANY);
-        
+
         // Run on shorcut
         Runnable runDownload = () -> handleRssDownload(null);
         Runnable runConfig = () -> handleConfig(null);
-        
+
         // Set shortcut to run
         mainApp.getPrimaryStage().getScene().getAccelerators().put(kcDonwload, runDownload);
         mainApp.getPrimaryStage().getScene().getAccelerators().put(kcConfig, runConfig);
-        
-        
-        
+
+
+
     }
 
     private void listenerSelectionTables() {
@@ -799,10 +802,10 @@ public class MainController {
         tableFilters.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
             filterSelected = newValue;
         }));
-        
+
         tableRssItems.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         tableRssItems.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            rssLastItemSelected = newValue;           
+            rssLastItemSelected = newValue;
         });
         tableRssItems.setOnMouseReleased((event) -> {
             ObservableList<RssItems> selectedItems = tableRssItems.getSelectionModel().getSelectedItems();
@@ -811,6 +814,71 @@ public class MainController {
                 rssAllSelected.add(selectedItem);
             }
         });
+    }
+
+    private void openFileClientTorrent(RssItems item) {
+        if(item == null){
+            return;
+        }
+        String session;
+        ClientBittorrent cliente;
+        StringBuilder url = new StringBuilder("http://");
+
+        final AlertIcon alert = new AlertIcon(Alert.AlertType.WARNING);
+        alert.setIcon(mainApp.getIconoApp());
+
+        try {
+            // Properties
+            final String host = ConfigApp.readProperty(ConfigApp.ConfigTypes.CLIENTTORR_HOST);
+            final String port = ConfigApp.readProperty(ConfigApp.ConfigTypes.CLIENTTORR_PORT);
+            final String user = ConfigApp.readProperty(ConfigApp.ConfigTypes.CLIENTTORR_USER);
+            final String pass = ConfigApp.readProperty(ConfigApp.ConfigTypes.CLIENTTORR_PASS);
+            final String directoryFile = ConfigApp.readProperty(ConfigApp.ConfigTypes.FOLDER_DOWNLOAD);
+
+
+
+            File file;
+            url.append(host);
+
+            if (port.isEmpty() == false) {
+                 url.append(":");
+                 url.append(port);
+             }
+
+            if(ConfigApp.readProperty(ConfigApp.ConfigTypes.CLIENTTORR_APP).equals(ClientAppTorrentType.QBITTORRENT41.toString())){
+                cliente = new Qbittorrent41(url.toString());
+                session = cliente.login(user, pass);
+
+                if(session == null || session.length() <= 1){
+                    alert.setContentText("Config client is not correct");
+                    alert.showAndWait();
+
+                    return;
+                }
+
+                file = new File(directoryFile + "/" + item.getFile());
+                if(file.exists() == false){
+                    alert.setContentText("File dont exist anymore");
+                    alert.showAndWait();
+
+                    return;
+                }
+
+                cliente.addTorrent(file);
+
+
+
+            }else{
+                throw new Exception("Client not supported");
+            }
+
+
+
+
+        } catch (Exception ex) {
+            mainApp.showAlertWithEx(ex);
+        }
+
     }
 
 }

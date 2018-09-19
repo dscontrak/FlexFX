@@ -85,7 +85,7 @@ public class ConfigController {
 
     @FXML
     private Button btnTestClient;
-    
+
     @FXML
     private CheckBox chkAddPause;
 
@@ -146,7 +146,7 @@ public class ConfigController {
             } else {
                 rbnClientInactive.setSelected(true);
             }
-            
+
             if("true".equals(isAddPause)){
                 chkAddPause.setSelected(true);
             }else{
@@ -182,6 +182,7 @@ public class ConfigController {
     @FXML
     void handleClientTest(ActionEvent event) {
         ClientBittorrent cliente;
+
         InputValidatorHelper validatorClient = validClientData();
         StringBuilder url = new StringBuilder("http://");
         final String clientSelected = cbxClientApp.getValue().toString();
@@ -208,10 +209,19 @@ public class ConfigController {
         try {
 
             if (clientSelected.equals(ClientAppTorrentType.QBITTORRENT41.toString())) {
-                
-                cliente = new Qbittorrent41(url.toString());                
+
+                cliente = new Qbittorrent41(url.toString());
                 cliente.setAddPauseState(isAddPause);
-                cliente.login(txtClientUser.getText(), txtClientPass.getText());
+                String session = cliente.login(txtClientUser.getText(), txtClientPass.getText());
+                if(session == null || session.length() <= 1){
+                    alert.setContentText("Config client is not correct");
+                    alert.showAndWait();
+                }else{
+                    final AlertIcon successAlert = new AlertIcon(Alert.AlertType.INFORMATION);
+                    successAlert.setIcon(mainApp.getIconoApp());
+                    successAlert.setContentText("Success connection");
+                    successAlert.showAndWait();
+                }
 
             }else{
                 throw new Exception("Dont exist implementation the current cliente selected");
@@ -266,7 +276,7 @@ public class ConfigController {
             valuesProperties.put(ConfigApp.ConfigTypes.PROXY_HOST.nameProp(), txtProxyHost.getText());
             valuesProperties.put(ConfigApp.ConfigTypes.PROXY_PORT.nameProp(), txtProxyPort.getText());
             valuesProperties.put(ConfigApp.ConfigTypes.PROXY_USE.nameProp(), rbnProxyActive.isSelected() ? "true" : "false");
-            
+
 
             configApp.writeAllProperties(valuesProperties);
             configApp.loadProperties();

@@ -11,6 +11,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import static org.apache.http.HttpHeaders.USER_AGENT;
 import org.apache.http.HttpResponse;
@@ -32,8 +33,10 @@ import org.apache.http.message.BasicNameValuePair;
  * @author daniel_serna
  */
 public class Qbittorrent41 extends ClientBittorrent {
-    
+
     private final String apiLogin = "/api/v2/auth/login";
+    private final String apiAddFileTorrent = "/api/v2/torrents/add";
+    private final String cookieKey = "set-cookie";
 
     public Qbittorrent41(String url) {
         super(url);
@@ -57,24 +60,27 @@ public class Qbittorrent41 extends ClientBittorrent {
         int responseCode;
         // Client
         try (CloseableHttpClient client = HttpClients.createDefault()) {
+
+            HttpPost post = new HttpPost(url + apiAddFileTorrent);
+            post.setHeader("User-Agent", USER_AGENT);
+            post.setHeader("Host", "127.0.0.1");
+            post.setHeader("Cookie", "SID=" + session);
             
-            HttpPost httpPost = new HttpPost(url);
-            httpPost.setHeader("Cookie", "SID=" + session);
-            
+
             // Send Data
             MultipartEntityBuilder builder = MultipartEntityBuilder.create();
             FileBody fileBody = new FileBody(file, ContentType.DEFAULT_BINARY);
-            
+
             // set attributes
             builder.addPart("torrents", fileBody);
             if (pathToSave != null && pathToSave.isEmpty() == false) {
                 builder.addTextBody("savepath", pathToSave);
             }
-            builder.addTextBody("paused", String.valueOf(addPauseState));                       
+            builder.addTextBody("paused", String.valueOf(addPauseState));
             HttpEntity multipart = builder.build();
-            httpPost.setEntity(multipart);
-            
-            CloseableHttpResponse response = client.execute(httpPost);            
+            post.setEntity(multipart);
+
+            CloseableHttpResponse response = client.execute(post);
             responseCode = response.getStatusLine().getStatusCode();
         }
 
@@ -96,6 +102,10 @@ public class Qbittorrent41 extends ClientBittorrent {
     public String login(String user, String pass) throws UnsupportedEncodingException, IOException {
         // Info: https://www.mkyong.com/java/apache-httpclient-examples/
 
+        if(session != null && session.isEmpty() == false){
+            return session;
+        }
+
         HttpClient client = HttpClientBuilder.create().build();
         HttpPost post = new HttpPost(url + apiLogin);
 
@@ -115,6 +125,37 @@ public class Qbittorrent41 extends ClientBittorrent {
         int responseCode = response.getStatusLine().getStatusCode();
         if (responseCode == 200) {
             // TODO: Set session read lines, more info on Web
+
+            //get all headers
+            Header[] headers = response.getAllHeaders();
+            for (Header header : headers) {
+                System.out.println("Key : " + header.getName()
+                        + " ,Value : " + header.getValue());
+
+                if(cookieKey.equals(header.getName())){
+                      return session = getSessionFromCookie(header.getValue());
+                }
+
+            }
+
+        }
+
+        return null;
+    }
+
+    private String getSessionFromCookie(String valueCookie){
+        String []comaSeparetor = valueCookie.split(";");
+
+        if(comaSeparetor.length == 0){
+            return null;
+        }
+
+        for (String currentVal : comaSeparetor) {
+            if(currentVal.contains("SID")){
+                int positionEqual = currentVal.indexOf("=");
+
+                return currentVal.substring(positionEqual, currentVal.length());
+            }
         }
 
         return null;
