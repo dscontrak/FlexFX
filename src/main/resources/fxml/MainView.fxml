@@ -81,7 +81,7 @@
                   </TableView>
                   <HBox alignment="CENTER_LEFT" maxHeight="40.0" prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
                      <children>
-                        <Label text="Torrent File : ">
+                        <Label text="File : ">
                            <HBox.margin>
                               <Insets right="5.0" />
                            </HBox.margin>
@@ -94,7 +94,7 @@
                               <Insets bottom="5.0" right="5.0" top="5.0" />
                            </HBox.margin>
                         </Button>
-                        <Button alignment="TOP_LEFT" disable="true" mnemonicParsing="false" text="Download ">
+                        <Button fx:id="btnRssItemDownload" alignment="TOP_LEFT" disable="true" mnemonicParsing="false" onAction="#handleRssItemDownload" text="Download ">
                            <graphic>
                               <FontAwesomeIconView glyphName="DOWNLOAD" />
                            </graphic>
@@ -102,7 +102,7 @@
                               <Insets right="20.0" />
                            </HBox.margin>
                         </Button>
-                        <Label text="Torrent Client: ">
+                        <Label text="Client: ">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
@@ -175,11 +175,6 @@
                            <HBox.margin>
                               <Insets bottom="5.0" right="5.0" top="5.0" />
                            </HBox.margin>
-                        </Button>
-                        <Button disable="true" mnemonicParsing="false">
-                           <graphic>
-                              <FontAwesomeIconView glyphName="EXCHANGE" />
-                           </graphic>
                         </Button>
                      </children>
                   </HBox>
