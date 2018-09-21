@@ -65,7 +65,7 @@ public class Qbittorrent41 extends ClientBittorrent {
             post.setHeader("User-Agent", USER_AGENT);
             post.setHeader("Host", "127.0.0.1");
             post.setHeader("Cookie", "SID=" + session);
-            
+
 
             // Send Data
             MultipartEntityBuilder builder = MultipartEntityBuilder.create();
@@ -154,7 +154,7 @@ public class Qbittorrent41 extends ClientBittorrent {
             if(currentVal.contains("SID")){
                 int positionEqual = currentVal.indexOf("=");
 
-                return currentVal.substring(positionEqual, currentVal.length());
+                return currentVal.substring(positionEqual + 1, currentVal.length());
             }
         }
 
