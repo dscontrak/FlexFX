@@ -17,6 +17,7 @@ import com.grupoad3.flexfx.db.model.RssItems;
 import com.grupoad3.flexfx.db.services.MediaFilterService;
 import com.grupoad3.flexfx.db.services.RssItemService;
 import com.grupoad3.flexfx.db.services.RssService;
+import com.grupoad3.flexfx.process.ServiceRssItemDownloadTask;
 import com.grupoad3.flexfx.process.ServiceRssItemsTask;
 import com.grupoad3.flexfx.ui.AlertIcon;
 import com.grupoad3.flexfx.ui.TableCellMediaFilterColorActive;
@@ -121,7 +122,10 @@ public class MainController {
 
     @FXML
     private Button btnRssItemLinkClient;
-
+    
+    @FXML
+    private Button btnRssItemDownload;
+    
     // ------ Media filter section --------------
     @FXML
     private TableView<MediaFilters> tableFilters;
@@ -172,6 +176,7 @@ public class MainController {
     private HashSet<RssItems> rssAllSelected = new HashSet<>();
 
     ServiceRssItemsTask serviceRssItemsService;
+    ServiceRssItemDownloadTask downloadTask;
 
     /*@Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -209,6 +214,7 @@ public class MainController {
 
         hboxProgress.setVisible(false);
         serviceRssItemsService = new ServiceRssItemsTask();
+        downloadTask = new ServiceRssItemDownloadTask();
 
         mapColumnsFilters();
         mapColumnsRssItems();
@@ -508,7 +514,7 @@ public class MainController {
 
                 serviceRssItemsService.setRss(rssSelected);
                 //serviceRssItemsService.setFilters(mainApp.getMediaFiltersData()); //Change only active
-                serviceRssItemsService.setPath(ConfigApp.readProperty(ConfigApp.ConfigTypes.FOLDER_DOWNLOAD));
+                serviceRssItemsService.setPath(pathDir);
 
                 // event fail
                 serviceRssItemsService.setOnFailed(eventFail -> {
@@ -559,6 +565,7 @@ public class MainController {
         txtFilterSearch.setDisable(false);
 
         btnRssItemOpen.setDisable(false);
+        btnRssItemDownload.setDisable(false);
 
         try {
             if(ConfigApp.readProperty(ConfigApp.ConfigTypes.CLIENTTORR_USE).equals("true")){
@@ -659,7 +666,76 @@ public class MainController {
     void handleRssItemLinkClient(ActionEvent event) {
          System.out.println("com.grupoad3.flexfx.controller.MainController.handleRssItemLinkClient()");
     }
+    
+    @FXML
+    void handleRssItemDownload(ActionEvent event) {
+        AlertIcon alert;
+        String pathDir;
+        File filePath;
+        
+        alert = new AlertIcon(Alert.AlertType.WARNING);
+        alert.setIcon(mainApp.getIconoApp());
+        alert.setTitle("Warning");
 
+        if (rssLastItemSelected == null) {            
+            alert.setContentText("Select one item to download");            
+            alert.showAndWait();
+            return;
+        }
+        
+        if(rssLastItemSelected.getLink() == null || rssLastItemSelected.getLink().isEmpty()){
+            alert.setContentText("Item selected does not have a link to download");            
+            alert.showAndWait();
+            return;
+        }
+        
+        if(serviceRssItemsService.isRunning()){
+            alert.setContentText("Other task is running");            
+            alert.showAndWait();
+            return;
+        }
+        
+        try {
+            pathDir = ConfigApp.readProperty(ConfigApp.ConfigTypes.FOLDER_DOWNLOAD);
+            filePath = new File(pathDir);
+            if (!filePath.exists()) {
+                if (!filePath.mkdirs()) {
+                    throw new Exception("Dont is possible create a folder in: \n" + filePath.getAbsolutePath());
+                }
+            }
+            
+            hboxProgress.setVisible(true);
+            lblProgress.textProperty().bind(downloadTask.messageProperty());
+            
+            downloadTask.setRssItem(rssLastItemSelected);
+            downloadTask.setPath(pathDir);
+            
+            // event fail
+            downloadTask.setOnFailed(eventFail -> {
+                hboxProgress.setVisible(false);
+                mainApp.showAlertWithEx(downloadTask.getException());
+            });
+            
+            // event success
+            downloadTask.setOnSucceeded((eventSuccess) -> {
+                if(downloadTask.getValue()){
+                    rssLastItemSelected.setStatus(ItemStatus.DOWNLOADED);                
+                }
+                hboxProgress.setVisible(false);
+            });
+            
+            downloadTask.reset();
+            downloadTask.start();
+            
+            
+        } catch (Exception e) {
+            hboxProgress.setVisible(false);
+            mainApp.showAlertWithEx(e);
+        }                
+        
+        
+    }
+    
     private synchronized void openFileItemSelected(RssItems item){
         try {
             AlertIcon alertIcon = new AlertIcon(Alert.AlertType.WARNING);
@@ -760,14 +836,21 @@ public class MainController {
     private void setTooltips() {
         final Tooltip tipBtnRssDownload = new Tooltip();
         final Tooltip tipBtnRssConfig = new Tooltip();
+        final Tooltip tipBtnOpenItem = new Tooltip();
+        final Tooltip tipBtnSendFileItem = new Tooltip();
 
         // set text
-        tipBtnRssDownload.setText("Syncronize Rss and Download files \nfrom RSS (Ctrl+S)");
+        tipBtnRssDownload.setText("Syncronize Rss and Download files \nfrom RSS (Ctrl+D)");
         tipBtnRssConfig.setText("Preferences (Ctrl+P)");
+        tipBtnOpenItem.setText("Open file with default torrent client (Ctrl+O)");
+        tipBtnSendFileItem.setText("Send file by API \nwith torrent cliente configured  (Ctrl+P)");
 
         // bind with control
         btnRssDownload.setTooltip(tipBtnRssDownload);
         btnRssConfig.setTooltip(tipBtnRssConfig);
+        btnRssItemOpen.setTooltip(tipBtnOpenItem);
+        btnRssItemOpenClient.setTooltip(tipBtnSendFileItem);
+        
 
 
     }
@@ -779,16 +862,22 @@ public class MainController {
         }
 
         // Combination
-        KeyCombination kcDonwload = new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_ANY);
+        KeyCombination kcDonwload = new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_ANY);
         KeyCombination kcConfig = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_ANY);
+        KeyCombination kcOpenItem = new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_ANY);
+        KeyCombination kcSendFileItem = new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_ANY);
 
         // Run on shorcut
         Runnable runDownload = () -> handleRssDownload(null);
         Runnable runConfig = () -> handleConfig(null);
+        Runnable runOpenItem = () -> handleRssItemOpen(null);
+        Runnable runSendFileItem = () -> handleRssItemOpenClient(null);        
 
         // Set shortcut to run
         mainApp.getPrimaryStage().getScene().getAccelerators().put(kcDonwload, runDownload);
         mainApp.getPrimaryStage().getScene().getAccelerators().put(kcConfig, runConfig);
+        mainApp.getPrimaryStage().getScene().getAccelerators().put(kcOpenItem, runOpenItem);
+        mainApp.getPrimaryStage().getScene().getAccelerators().put(kcSendFileItem, runSendFileItem);
 
 
 
