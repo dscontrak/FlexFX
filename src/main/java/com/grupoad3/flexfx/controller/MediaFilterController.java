@@ -12,6 +12,7 @@ import com.grupoad3.flexfx.db.model.Rss;
 import com.grupoad3.flexfx.db.services.MediaFilterService;
 import com.grupoad3.flexfx.ui.AlertIcon;
 import com.grupoad3.flexfx.util.InputValidatorHelper;
+import java.io.File;
 import java.io.IOException;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -130,6 +131,21 @@ public class MediaFilterController {
     void handleSave(){
         MediaFilterService filterService;
         InputValidatorHelper validator = isInputValid();
+        File folderSelected;
+        
+        final String pathFolder  = txtFolder.getText();
+        if(pathFolder != null && pathFolder.isEmpty() == false){
+            folderSelected = new File(pathFolder);
+            if(folderSelected.exists() == false){
+                
+                AlertIcon alert = new AlertIcon(AlertType.WARNING);
+                alert.setContentText("The folder selected dont exist");
+                alert.setIcon(mainApp.getIconoApp());
+                alert.showAndWait();
+                
+                return;
+            }
+        }
 
         if(validator.isExistError() == false){
             filterService = new MediaFilterService();

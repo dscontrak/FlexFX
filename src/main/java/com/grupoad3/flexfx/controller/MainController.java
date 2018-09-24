@@ -923,7 +923,8 @@ public class MainController {
             final String user = ConfigApp.readProperty(ConfigApp.ConfigTypes.CLIENTTORR_USER);
             final String pass = ConfigApp.readProperty(ConfigApp.ConfigTypes.CLIENTTORR_PASS);
             final String directoryFile = ConfigApp.readProperty(ConfigApp.ConfigTypes.FOLDER_DOWNLOAD);
-
+            
+            final MediaFilters filtroItem = item.getMediafilter();
 
 
             File file;
@@ -937,7 +938,7 @@ public class MainController {
             if(ConfigApp.readProperty(ConfigApp.ConfigTypes.CLIENTTORR_APP).equals(ClientAppTorrentType.QBITTORRENT41.toString())){
                 cliente = new Qbittorrent41(url.toString());
                 session = cliente.login(user, pass);
-
+                
                 if(session == null || session.length() <= 1){
                     alert.setContentText("Config client is not correct");
                     alert.showAndWait();
@@ -953,6 +954,9 @@ public class MainController {
                     return;
                 }
 
+                if(filtroItem != null && filtroItem.getFolderpath() != null){
+                    cliente.setPathToSave(filtroItem.getFolderpath());
+                }
                 cliente.addTorrent(file);
 
 

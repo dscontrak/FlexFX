@@ -82,6 +82,9 @@ public class ModelMediaAndItemsCreate {
             RssItemService rssItemService = new RssItemService();            
             RssItems item;
             
+            MediaFilters filter = new MediaFilters();
+            filter.setId(4);
+            
             item = new RssItems();
             item.setTitle("titulo" + random);
             item.setGuid("guid" + random);
@@ -90,6 +93,7 @@ public class ModelMediaAndItemsCreate {
             item.setLink("link"+random);
             item.setDatepub(LocalDateTime.now());
             item.setDatedown(LocalDateTime.now());
+            item.setMediafilter(filter);
             
             itemCreated = rssItemService.create(item);
             

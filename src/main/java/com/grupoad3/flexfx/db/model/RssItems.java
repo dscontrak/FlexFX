@@ -61,7 +61,7 @@ public class RssItems {
     @DatabaseField(canBeNull = false, foreign = true)
     private Rss rss;
 
-    @DatabaseField(canBeNull = true, foreign = true)
+    @DatabaseField(canBeNull = true, foreign = true, foreignAutoRefresh = true)
     private MediaFilters mediafilter;
     /*private Integer _idmediafilter;
     private IntegerProperty idmediafilter;*/
