@@ -6,6 +6,7 @@
  */
 package com.grupoad3.flexfx.process;
 
+import com.grupoad3.flexfx.clientbit.ManageClientBit;
 import com.grupoad3.flexfx.db.model.ItemStatus;
 import com.grupoad3.flexfx.db.model.MediaFilters;
 import com.grupoad3.flexfx.db.model.Rss;
@@ -60,6 +61,8 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
     private Rss rss;
     //private List<MediaFilters> filters;
     private String path;
+    private boolean isClientUse; 
+    private ManageClientBit manageClientBit = null;    
 
     public final void setRss(Rss value) {
         rss = value;
@@ -97,11 +100,26 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
         return proxyport.get();
     }
 
+    public boolean isIsClientUse() {
+        return isClientUse;
+    }
+
+    public void setIsClientUse(boolean isClientUse) {
+        this.isClientUse = isClientUse;
+    }        
+
     @Override
     protected Task<List<RssItems>> createTask() {
         final Rss _rss = rss;
         final String _path = path;
-
+            
+        try {
+            manageClientBit = new ManageClientBit();
+        } catch (Exception ex) {
+            // Ignored
+        }
+        
+ 
         return new Task<List<RssItems>>() {
             @Override
             protected List<RssItems> call() throws Exception {
@@ -117,6 +135,8 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
                     Thread.sleep(2000);
                     return null;
                 }
+                
+                
 
                 // Data and rss
                 HashSet<RssItems> itemsAll = new HashSet<>();
@@ -227,7 +247,7 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
             }
 
             private void downloadAndSave(RssItems itemToAnalize, RssItemService db) {
-
+                
                 // if has been donwloaded return
                 if (itemToAnalize.getStatus().equals(downStatus)) {
                     return;
@@ -250,9 +270,15 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
                     DownloadFileHttpCilent downloadFile = new DownloadFileHttpCilent(url, path + "/" + fileName);
                     try {
                         downloadFile.download();
+                        if(manageClientBit != null && isClientUse){
+                            manageClientBit.sendFile(fileName, itemToAnalize.getMediafilter().getFolderpath());
+                        } 
+                        
                     } catch (IOException ex) {
                         Logger.getLogger(ServiceRssItemsTask.class.getName()).log(Level.SEVERE, null, ex);
                         itemToAnalize.setStatus(ItemStatus.ERROR);
+                    } catch (Exception ex) {
+                        Logger.getLogger(ServiceRssItemsTask.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     itemToAnalize.setFile(fileName);
                     itemToAnalize.setDatedown(LocalDateTime.now());
