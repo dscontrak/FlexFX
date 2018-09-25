@@ -64,8 +64,9 @@ public class MediaFilterService extends AbstractDaoService<MediaFilters> {
             }
 
             builder.where().eq(RssItems.ID_RSS_FIELD_NAME, rss.getId());
-            builder.orderBy(MediaFilters.FADD_FIELD_NAME, true);
-            builder.orderBy(MediaFilters.ACTIVE_FIELD_NAME, true);
+            builder.orderBy(MediaFilters.ACTIVE_FIELD_NAME, false);
+            builder.orderBy(MediaFilters.FMOD_FIELD_NAME, false);
+
 
             return builder.query();
 
@@ -108,10 +109,10 @@ public class MediaFilterService extends AbstractDaoService<MediaFilters> {
             if(filter.getTitle() != null && filter.getTitle().isEmpty() == false){
                 where.and().like(MediaFilters.TITLE_FIELD_NAME, "%" + filter.getTitle().trim() +"%");
             }
-            
-            
-            builder.orderBy(MediaFilters.FADD_FIELD_NAME, true);
-            builder.orderBy(MediaFilters.ACTIVE_FIELD_NAME, true);
+
+
+            builder.orderBy(MediaFilters.ACTIVE_FIELD_NAME, false);
+            builder.orderBy(MediaFilters.FMOD_FIELD_NAME, false);
 
             return builder.query();
 

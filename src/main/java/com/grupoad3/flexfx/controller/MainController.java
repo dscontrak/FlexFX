@@ -120,12 +120,12 @@ public class MainController {
     @FXML
     private Button btnRssItemOpenClient;
 
-    @FXML
-    private Button btnRssItemLinkClient;
-    
+    /*@FXML
+    private Button btnRssItemLinkClient;*/
+
     @FXML
     private Button btnRssItemDownload;
-    
+
     // ------ Media filter section --------------
     @FXML
     private TableView<MediaFilters> tableFilters;
@@ -160,12 +160,10 @@ public class MainController {
     @FXML
     private TextField txtFilterSearch;
 
-    // TODO: Agregar la fucionalidas para descargar de nuevo el archivo con multiseleccion
-    // TODO: Agregar funcionalidad con qBittorrent y Transmission/Deluge solo para agregar basarse en: tympanix / Electorrent
-    // ---- Future
-    // TODO: Poner el proceso de carga debajo del boton de descarga
-    // TODO: Poner la funcionalidad del media filter con los archivos descargdos relacionados
-    // TODO: Obtener información de API de algun lado del titulo
+    // TODO: Agrear la funcionalidad de agregar de forma automática
+    // TODO: Crear un clase manejador del cliente bittorrent
+    // TODO: Probar la descarga aquellos ignorados de forma manual.
+    // TODO: Soportar mas versiones de QBitorrent
 
     // Reference to the main application.
     private MainApp mainApp;
@@ -389,8 +387,8 @@ public class MainController {
 
         boolean isSaved = mainApp.showMediaFilterEditDialog(filter, rssSelected);
         if (isSaved) {
-            mainApp.getMediaFiltersData().remove(filter);
-            mainApp.getMediaFiltersData().add(filter);
+            // Is observable
+            tableFilters.refresh();
         }
     }
 
@@ -569,7 +567,7 @@ public class MainController {
 
         try {
             if(ConfigApp.readProperty(ConfigApp.ConfigTypes.CLIENTTORR_USE).equals("true")){
-                btnRssItemLinkClient.setDisable(false);
+                //btnRssItemLinkClient.setDisable(false);
                 btnRssItemOpenClient.setDisable(false);
             }
         } catch (Exception ex) {
@@ -662,39 +660,39 @@ public class MainController {
         openFileClientTorrent(rssLastItemSelected);
     }
 
-     @FXML
+    /*@FXML
     void handleRssItemLinkClient(ActionEvent event) {
          System.out.println("com.grupoad3.flexfx.controller.MainController.handleRssItemLinkClient()");
-    }
-    
+    }*/
+
     @FXML
     void handleRssItemDownload(ActionEvent event) {
         AlertIcon alert;
         String pathDir;
         File filePath;
-        
+
         alert = new AlertIcon(Alert.AlertType.WARNING);
         alert.setIcon(mainApp.getIconoApp());
         alert.setTitle("Warning");
 
-        if (rssLastItemSelected == null) {            
-            alert.setContentText("Select one item to download");            
+        if (rssLastItemSelected == null) {
+            alert.setContentText("Select one item to download");
             alert.showAndWait();
             return;
         }
-        
+
         if(rssLastItemSelected.getLink() == null || rssLastItemSelected.getLink().isEmpty()){
-            alert.setContentText("Item selected does not have a link to download");            
+            alert.setContentText("Item selected does not have a link to download");
             alert.showAndWait();
             return;
         }
-        
+
         if(serviceRssItemsService.isRunning()){
-            alert.setContentText("Other task is running");            
+            alert.setContentText("Other task is running");
             alert.showAndWait();
             return;
         }
-        
+
         try {
             pathDir = ConfigApp.readProperty(ConfigApp.ConfigTypes.FOLDER_DOWNLOAD);
             filePath = new File(pathDir);
@@ -703,39 +701,39 @@ public class MainController {
                     throw new Exception("Dont is possible create a folder in: \n" + filePath.getAbsolutePath());
                 }
             }
-            
+
             hboxProgress.setVisible(true);
             lblProgress.textProperty().bind(downloadTask.messageProperty());
-            
+
             downloadTask.setRssItem(rssLastItemSelected);
             downloadTask.setPath(pathDir);
-            
+
             // event fail
             downloadTask.setOnFailed(eventFail -> {
                 hboxProgress.setVisible(false);
                 mainApp.showAlertWithEx(downloadTask.getException());
             });
-            
+
             // event success
             downloadTask.setOnSucceeded((eventSuccess) -> {
                 if(downloadTask.getValue()){
-                    rssLastItemSelected.setStatus(ItemStatus.DOWNLOADED);                
+                    rssLastItemSelected.setStatus(ItemStatus.DOWNLOADED);
                 }
                 hboxProgress.setVisible(false);
             });
-            
+
             downloadTask.reset();
             downloadTask.start();
-            
-            
+
+
         } catch (Exception e) {
             hboxProgress.setVisible(false);
             mainApp.showAlertWithEx(e);
-        }                
-        
-        
+        }
+
+
     }
-    
+
     private synchronized void openFileItemSelected(RssItems item){
         try {
             AlertIcon alertIcon = new AlertIcon(Alert.AlertType.WARNING);
@@ -850,7 +848,7 @@ public class MainController {
         btnRssConfig.setTooltip(tipBtnRssConfig);
         btnRssItemOpen.setTooltip(tipBtnOpenItem);
         btnRssItemOpenClient.setTooltip(tipBtnSendFileItem);
-        
+
 
 
     }
@@ -871,7 +869,7 @@ public class MainController {
         Runnable runDownload = () -> handleRssDownload(null);
         Runnable runConfig = () -> handleConfig(null);
         Runnable runOpenItem = () -> handleRssItemOpen(null);
-        Runnable runSendFileItem = () -> handleRssItemOpenClient(null);        
+        Runnable runSendFileItem = () -> handleRssItemOpenClient(null);
 
         // Set shortcut to run
         mainApp.getPrimaryStage().getScene().getAccelerators().put(kcDonwload, runDownload);
@@ -923,7 +921,7 @@ public class MainController {
             final String user = ConfigApp.readProperty(ConfigApp.ConfigTypes.CLIENTTORR_USER);
             final String pass = ConfigApp.readProperty(ConfigApp.ConfigTypes.CLIENTTORR_PASS);
             final String directoryFile = ConfigApp.readProperty(ConfigApp.ConfigTypes.FOLDER_DOWNLOAD);
-            
+
             final MediaFilters filtroItem = item.getMediafilter();
 
 
@@ -938,7 +936,7 @@ public class MainController {
             if(ConfigApp.readProperty(ConfigApp.ConfigTypes.CLIENTTORR_APP).equals(ClientAppTorrentType.QBITTORRENT41.toString())){
                 cliente = new Qbittorrent41(url.toString());
                 session = cliente.login(user, pass);
-                
+
                 if(session == null || session.length() <= 1){
                     alert.setContentText("Config client is not correct");
                     alert.showAndWait();
