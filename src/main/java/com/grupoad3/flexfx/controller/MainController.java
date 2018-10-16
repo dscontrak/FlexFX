@@ -8,10 +8,7 @@ package com.grupoad3.flexfx.controller;
 import com.grupoad3.flexfx.ConfigApp;
 import com.grupoad3.flexfx.MainApp;
 import com.grupoad3.flexfx.clientbit.ClientBitorrentException;
-import com.grupoad3.flexfx.clientbit.ClientBittorrent;
 import com.grupoad3.flexfx.clientbit.ManageClientBit;
-import com.grupoad3.flexfx.clientbit.Qbittorrent41;
-import com.grupoad3.flexfx.db.model.ClientAppTorrentType;
 import com.grupoad3.flexfx.db.model.ItemStatus;
 import com.grupoad3.flexfx.db.model.MediaFilters;
 import com.grupoad3.flexfx.db.model.Rss;
@@ -163,7 +160,7 @@ public class MainController {
 
     // TODO: Probar la descarga aquellos ignorados de forma manual.
     // TODO: Soportar mas versiones de QBitorrent
-    
+
     // Reference to the main application.
     private MainApp mainApp;
     private Rss rssSelected;
@@ -484,6 +481,7 @@ public class MainController {
         String pathDir;
         boolean isClientUse = false;
         File filePath;
+        ManageClientBit manageClientBit;
 
         if (mainApp.getMediaFiltersData() != null && mainApp.getMediaFiltersData().isEmpty()) {
             alert = new AlertIcon(Alert.AlertType.WARNING);
@@ -495,6 +493,13 @@ public class MainController {
         }
         try {
             isClientUse = ConfigApp.readProperty(ConfigApp.ConfigTypes.CLIENTTORR_USE).equals("true");
+
+            // Test connection
+            if(isClientUse){
+                manageClientBit = new ManageClientBit();
+                manageClientBit.getSession();
+            }
+
             pathDir = ConfigApp.readProperty(ConfigApp.ConfigTypes.FOLDER_DOWNLOAD);
             filePath = new File(pathDir);
             if (!filePath.exists()) {
@@ -658,14 +663,14 @@ public class MainController {
         if (rssAllSelected.isEmpty()) {
             return;
         }
-        
+
         if (rssAllSelected.size() == 1) {
             openFileClientTorrent(rssLastItemSelected);
         }else{
             openFileClientTorrent(new ArrayList<>(rssAllSelected));
         }
-        
-        
+
+
     }
 
     /*@FXML
@@ -909,7 +914,7 @@ public class MainController {
         final AlertIcon alert = new AlertIcon(Alert.AlertType.WARNING);
         alert.setIcon(mainApp.getIconoApp());
 
-        
+
         try {
 
             ManageClientBit clientBit = new ManageClientBit();
@@ -924,25 +929,25 @@ public class MainController {
             }
         }
     }
-    
+
     private void openFileClientTorrent(List<RssItems> items) {
-        
+
         if (items == null || items.isEmpty()) {
             return;
         }
-        
+
         StringBuilder warnings = new StringBuilder();
         final AlertIcon alert = new AlertIcon(Alert.AlertType.WARNING);
         alert.setIcon(mainApp.getIconoApp());
-        
+
         try {
-            
+
             ManageClientBit clientBit = new ManageClientBit();
-            
+
             for (RssItems item : items) {
                 clientBit.sendFile(item.getFile(), item.getMediafilter().getFolderpath());
             }
-            
+
 
         } catch (Exception ex) {
             if (ex instanceof ClientBitorrentException) {
@@ -951,7 +956,7 @@ public class MainController {
                 mainApp.showAlertWithEx(ex);
             }
         }
-        
+
         if(warnings.length() > 1){
             alert.setContentText(warnings.toString());
             alert.showAndWait();
