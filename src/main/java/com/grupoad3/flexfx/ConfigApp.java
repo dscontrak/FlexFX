@@ -24,13 +24,13 @@ public class ConfigApp {
 
     public static enum ConfigTypes {
         ISMIGRATED("app.ismigrated", "false"),
-        
+
         FOLDER_DOWNLOAD("app.folder", "./downloads"),
-        
+
         PROXY_USE("app.proxy.use", "false"),
         PROXY_HOST("app.proxy.host", "10.10.10.10"),
         PROXY_PORT("app.proxy.port", "1000"),
-        
+
         CLIENTTORR_USE("torrent.client.use", "false"),
         CLIENTTORR_HOST("torrent.client.host", "127.0.0.1"),
         CLIENTTORR_PORT("torrent.client.port", "80"),
@@ -71,13 +71,13 @@ public class ConfigApp {
     private final File file;
     private final String comments = "Delete to restart properties or edit to change manually";
     private final boolean isCreatedNewFile;
-    //private final File configFile; 
+    //private final File configFile;
     public static Properties properties = new Properties();
     private static boolean isLoadedProperies = false;
 
-    public ConfigApp() throws IOException {
+    public ConfigApp(String pathDirectory) throws IOException {
 
-        file = new File("./config.properties");
+        file = new File(pathDirectory + "/config.properties");
         if (file.exists()) {
             isCreatedNewFile = false;
         } else {
@@ -102,8 +102,8 @@ public class ConfigApp {
             throw new Exception("Dont found config value with key: " + key);
         }
     }
-    
-    public static Map<String,String> readAllProperties() throws Exception {        
+
+    public static Map<String,String> readAllProperties() throws Exception {
         Map<String,String> valuesProperties = new HashMap<>();
 
         if (isLoadedProperies == false) {
@@ -112,8 +112,8 @@ public class ConfigApp {
 
         for (ConfigTypes value : ConfigTypes.values()) {
                 valuesProperties.put(value.nameProp(), properties.getProperty(value.nameProp()));
-        } 
-        
+        }
+
         return valuesProperties;
     }
 
@@ -140,11 +140,11 @@ public class ConfigApp {
             prop.put(ConfigTypes.PROXY_USE.nameProp(), ConfigTypes.PROXY_USE.defaultVal());
             prop.put(ConfigTypes.PROXY_HOST.nameProp(), ConfigTypes.PROXY_HOST.defaultVal());
             prop.put(ConfigTypes.PROXY_PORT.nameProp(), ConfigTypes.PROXY_PORT.defaultVal());            */
-            
+
             for (ConfigTypes value : ConfigTypes.values()) {
                 prop.put(value.nameProp(), value.defaultVal());
             }
-            
+
 
             // store properties to the opened file
             prop.store(fos, comments);
@@ -154,29 +154,29 @@ public class ConfigApp {
         }
 
     }
-    
+
     public void writeAllProperties(Map<String,String> valuesProp) throws Exception {
         Properties prop = new Properties();
-        FileOutputStream fos = null;      
-        
+        FileOutputStream fos = null;
+
         // Order by key
         SortedSet<String> keys = new TreeSet<>(valuesProp.keySet());
 
         try {
 
             // create new file in or open existing file from the project's root folder
-            fos = new FileOutputStream(file);                                
-            
+            fos = new FileOutputStream(file);
+
             /*for (Map.Entry<String, String> entry : valuesProp.entrySet())
-            {                
+            {
                 prop.setProperty(entry.getKey(), entry.getValue());
             }*/
-            
+
             for (String key : keys) {
-                prop.setProperty(key, valuesProp.get(key));                
+                prop.setProperty(key, valuesProp.get(key));
             }
-            
-            
+
+
             // store properties to the opened file
             prop.store(fos, comments);
 
@@ -221,10 +221,10 @@ public class ConfigApp {
         FileOutputStream out;
         FileInputStream in = new FileInputStream(file);
         Properties props = new Properties();
-        // Load 
+        // Load
         props.load(in);
         in.close();
-        // Stream        
+        // Stream
         out = new FileOutputStream(file);
         props.setProperty(typeConfig.nameProp(), value);
         // Save

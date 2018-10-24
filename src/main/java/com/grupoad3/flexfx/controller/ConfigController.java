@@ -242,7 +242,7 @@ public class ConfigController {
         alert.setIcon(mainApp.getIconoApp());
 
         try {
-            ConfigApp configApp = new ConfigApp();
+            ConfigApp configApp = new ConfigApp(mainApp.getCurrentDirJAR());
 
             valuesProperties.put(ConfigApp.ConfigTypes.FOLDER_DOWNLOAD.nameProp(), txtDownFolder.getText());
 

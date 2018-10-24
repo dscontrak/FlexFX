@@ -12,7 +12,9 @@ import com.grupoad3.flexfx.db.services.RssService;
 import com.grupoad3.flexfx.ui.AlertIcon;
 import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
 import com.j256.ormlite.table.TableUtils;
+import java.io.File;
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,12 +33,19 @@ import javafx.stage.Stage;
 
 public class MainApp extends Application {
 
-    private final Image iconoApp = new Image(getClass().getResourceAsStream("/img/icon.png"));            
+    private static File databaseFile;
+
+    private final Image iconoApp = new Image(getClass().getResourceAsStream("/img/icon.png"));
     private Stage primaryStage;
     private final ObservableList<Rss> rssData = FXCollections.observableArrayList();
     private final ObservableList<RssItems> rssItemsData = FXCollections.observableArrayList();
     private final ObservableList<MediaFilters> mediaFiltersData = FXCollections.observableArrayList();
-    
+    private String currentDirJAR;
+
+    public synchronized static File getDatabaseFile() {
+        return databaseFile;
+    }
+
     public ObservableList<Rss> getRssData() {
         return rssData;
     }
@@ -48,7 +57,7 @@ public class MainApp extends Application {
     public ObservableList<MediaFilters> getMediaFiltersData() {
         return mediaFiltersData;
     }
-    
+
     public Stage getPrimaryStage() {
         return primaryStage;
     }
@@ -56,11 +65,28 @@ public class MainApp extends Application {
     public Image getIconoApp() {
         return iconoApp;
     }
-        
-        
+
+    public String getCurrentDirJAR() {
+        return currentDirJAR;
+    }
+
+
+
+
     @Override
     public void start(Stage stage) throws Exception {
-         
+
+        // Directory principal
+        File f = new File(System.getProperty("java.class.path"));
+        File dir = f.getAbsoluteFile().getParentFile();
+        currentDirJAR = URLDecoder.decode(dir.toString(), "UTF-8");
+
+        databaseFile = new File(currentDirJAR + "/database.db");
+        if (databaseFile.exists() == false) {
+                databaseFile.createNewFile();
+        }
+
+
         primaryStage = stage;
         primaryStage.setTitle("FlexFX");
         primaryStage.getIcons().add(iconoApp);
@@ -68,12 +94,12 @@ public class MainApp extends Application {
         initProperties();
         initDBMigration();
         initData();
-        
-        showMainViewWindow();                
+
+        showMainViewWindow();
     }
-    
+
     /**
-     * 
+     *
      * @param ex Set error exeption
      */
     public void showAlertWithEx(Throwable ex){
@@ -94,12 +120,12 @@ public class MainApp extends Application {
             scene.getStylesheets().add(getClass().getResource("/styles/Styles.css").toString());
             primaryStage.setScene(scene);
             primaryStage.show();
-            
+
             // Poniendo el controlador de la vista y poniendo la app contenedora.
             MainController controlador = loader.getController();
-            controlador.setMainApp(this);                       
-            
-            
+            controlador.setMainApp(this);
+
+
         } catch (IOException e) {
             showAlertWithEx(e);
         }
@@ -120,74 +146,74 @@ public class MainApp extends Application {
 
     private void initProperties() {
         try {
-            ConfigApp config = new ConfigApp();
+            ConfigApp config = new ConfigApp(this.getCurrentDirJAR());
             config.setup();
             config.loadProperties();
-            
+
         } catch (Exception ex) {
             Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     private void initData() {
         try {
-            RssService rssService = new RssService();                                         
-            
+            RssService rssService = new RssService();
+
             List<Rss> listRss = rssService.getLastRssNotDeleted();
             listRss.forEach((r) -> {
                 rssData.add(r);
-            });                                    
-            
+            });
+
         } catch (IOException ex) {
             showAlertWithEx(ex);
         }
     }
-   
+
 
     private void initDBMigration() {
         try {
-            ConfigApp config = new ConfigApp();
+            ConfigApp config = new ConfigApp(this.getCurrentDirJAR());
             config.loadProperties();
             String isMigrated = ConfigApp.readProperty(ConfigApp.ConfigTypes.ISMIGRATED);
-            
+
             if (isMigrated != null && isMigrated.equals("false")) {
                 JdbcPooledConnectionSource connection = DatabaseUtils.getConexion();
-                
+
                 // Tables
                 TableUtils.createTableIfNotExists(connection, Rss.class);
                 TableUtils.createTableIfNotExists(connection, RssItems.class);
                 TableUtils.createTableIfNotExists(connection, MediaFilters.class);
-                
+
                 // Writeproperties
                 config.writeProperty(ConfigApp.ConfigTypes.ISMIGRATED, "true");
                 config.loadProperties();
-                
+
             }
         } catch (Exception e) {
-            showAlertWithEx(e);        
+            showAlertWithEx(e);
         }
     }
 
     public boolean showMediaFilterEditDialog(MediaFilters filter, Rss rss) {
         // Load the fxml file and create a new stage for the popup dialog.
         FXMLLoader loader = new FXMLLoader();
-        
+
         try {
             loader.setLocation(getClass().getResource("/fxml/MediaFilterAdd.fxml"));
             AnchorPane page = (AnchorPane) loader.load();
-            
+
             // Create dialog stage
             Stage dialoStage = new Stage();
             dialoStage.setTitle("Media Filter");
             dialoStage.initModality(Modality.WINDOW_MODAL);
             dialoStage.initOwner(primaryStage);
-            
-            
+
+
             dialoStage.getIcons().add(iconoApp);
-            
+
             // Scene
             Scene scene = new Scene(page);
-            
+
             // Set scene and controller
             dialoStage.setScene(scene);
             MediaFilterController controller = loader.getController();
@@ -195,59 +221,59 @@ public class MainApp extends Application {
             controller.setDialogStage(dialoStage);
             controller.setMediaFilter(filter);
             controller.setCurrentRss(rss);
-            
+
             // Show
             dialoStage.showAndWait();
-                    
+
             return controller.isSaved();
-            
+
         } catch (Exception e) {
             showAlertWithEx(e);
             return false;
         }
-        
-        
+
+
     }
 
     public boolean showRssEditDialog(Rss rss) {
-        
+
         // Load the fxml file and create a new stage for the popup dialog.
         FXMLLoader loader = new FXMLLoader();
-        
+
         try {
             loader.setLocation(getClass().getResource("/fxml/RssAdd.fxml"));
             AnchorPane page = (AnchorPane) loader.load();
-            
+
             // Create dialog stage
             Stage dialoStage = new Stage();
             dialoStage.setTitle("Rss");
             dialoStage.initModality(Modality.WINDOW_MODAL);
-            dialoStage.initOwner(primaryStage);            
-            
+            dialoStage.initOwner(primaryStage);
+
             dialoStage.getIcons().add(iconoApp);
-            
+
             // Scene
             Scene scene = new Scene(page);
-            
+
             // Set scene and controller
             dialoStage.setScene(scene);
             RssController controller = loader.getController();
-            controller.setMainApp(this);               
+            controller.setMainApp(this);
             controller.setDialogStage(dialoStage);
             controller.setCurrentRss(rss);
-            
-            
+
+
             // Show
             dialoStage.showAndWait();
-                    
+
             return controller.isSaved();
-            
+
         } catch (Exception e) {
             showAlertWithEx(e);
             return false;
         }
-        
-        
+
+
     }
 
     public boolean showConfigDialog() {
@@ -256,29 +282,29 @@ public class MainApp extends Application {
         try {
             loader.setLocation(getClass().getResource("/fxml/ConfigView.fxml"));
             AnchorPane page = (AnchorPane) loader.load();
-            
+
             // Create dialog stage
             Stage dialoStage = new Stage();
             dialoStage.setTitle("Config");
             dialoStage.initModality(Modality.WINDOW_MODAL);
-            dialoStage.initOwner(primaryStage);            
-            
+            dialoStage.initOwner(primaryStage);
+
             dialoStage.getIcons().add(iconoApp);
-            
+
             // Scene
             Scene scene = new Scene(page);
-            
+
             // Set scene and controller
             dialoStage.setScene(scene);
-            ConfigController controller = loader.getController();    
-            controller.setMainApp(this);               
+            ConfigController controller = loader.getController();
+            controller.setMainApp(this);
             controller.setDialogStage(dialoStage);
-            
+
              // Show
             dialoStage.showAndWait();
-            
+
             return controller.isSaved();
-            
+
         } catch (Exception e) {
             showAlertWithEx(e);
             return false;

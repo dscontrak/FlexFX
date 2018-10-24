@@ -5,10 +5,8 @@
  */
 package com.grupoad3.flexfx.db;
 
-import com.j256.ormlite.jdbc.JdbcConnectionSource;
+import com.grupoad3.flexfx.MainApp;
 import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
-import com.j256.ormlite.support.ConnectionSource;
-import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -18,17 +16,15 @@ import java.sql.SQLException;
  */
 public class DatabaseUtils {
     private static final String DATABASE_URL = "jdbc:sqlite:";
-    private static final File databaseFile = new File("./database.db");
-    
+
+
     public static JdbcPooledConnectionSource getConexion() throws SQLException, IOException {
-        
+
         JdbcPooledConnectionSource connectionSource;
-        
-        if (databaseFile.exists() == false) {
-                databaseFile.createNewFile();
-        }
-        
-        connectionSource = new JdbcPooledConnectionSource(DATABASE_URL + databaseFile.getAbsolutePath());
+
+
+
+        connectionSource = new JdbcPooledConnectionSource(DATABASE_URL + MainApp.getDatabaseFile().getAbsolutePath());
 
         try {
             //Loading the sqlite drivers
@@ -37,8 +33,8 @@ public class DatabaseUtils {
             //Should never happen
             throw new SQLException(e);
         }
-        
+
         return connectionSource;
     }
-    
+
 }
