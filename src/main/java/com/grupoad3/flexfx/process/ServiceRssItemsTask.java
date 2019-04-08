@@ -21,6 +21,7 @@ import com.sun.syndication.feed.synd.SyndEntryImpl;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
@@ -246,7 +247,9 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
                 return new ArrayList<>(itemsToAdd);
             }
 
-            private void downloadAndSave(RssItems itemToAnalize, RssItemService db) {
+            private void downloadAndSave(RssItems itemToAnalize, RssItemService db) throws IOException {
+                
+                File fileToSave = null;
                 
                 // if has been donwloaded return
                 if (itemToAnalize.getStatus().equals(downStatus)) {
@@ -266,8 +269,15 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
 
                     String url = itemToAnalize.getLink();
                     String fileName = url.substring(url.lastIndexOf('/') + 1, url.length());
+                   
+                    
+                    if(DownloadFileHttpCilent.isFilenameValid(fileName) == false){
+                        fileToSave = File.createTempFile(itemToAnalize.getMediafilter().getFiltermain(), ".torrent", new File(path));                        
+                    }else{
+                        fileToSave = new File(path + "/" + fileName);
+                    }
 
-                    DownloadFileHttpCilent downloadFile = new DownloadFileHttpCilent(url, path + "/" + fileName);
+                    DownloadFileHttpCilent downloadFile = new DownloadFileHttpCilent(url, fileToSave);
                     try {
                         downloadFile.download();
                         if(manageClientBit != null && isClientUse){
@@ -280,7 +290,7 @@ public class ServiceRssItemsTask extends Service<List<RssItems>> {
                     } catch (Exception ex) {
                         Logger.getLogger(ServiceRssItemsTask.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    itemToAnalize.setFile(fileName);
+                    itemToAnalize.setFile(fileToSave.getName());
                     itemToAnalize.setDatedown(LocalDateTime.now());
 
                 }

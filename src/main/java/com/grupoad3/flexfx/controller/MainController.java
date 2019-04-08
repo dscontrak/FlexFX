@@ -68,6 +68,9 @@ public class MainController {
     private TableColumn<Rss, String> titleRssTable;
 
     @FXML
+    private Label lblNameApp;
+    
+    @FXML
     private Label lblRssTitle;
 
     @FXML
@@ -183,6 +186,7 @@ public class MainController {
      */
     public void setMainApp(MainApp mainApp) {
         this.mainApp = mainApp;
+        lblNameApp.setText(mainApp.NAME_APP);
         // Add observable list data to the table and bindings
         tableRss.setItems(mainApp.getRssData());
         tableFilters.setItems(mainApp.getMediaFiltersData());
@@ -197,7 +201,7 @@ public class MainController {
      * after the fxml file has been loaded.
      */
     @FXML
-    private void initialize() {
+    public void initialize() {
         // Initialize the person table with the two columns.
         titleRssTable.setCellValueFactory(cellData -> cellData.getValue().titleProperty());
 
@@ -225,11 +229,16 @@ public class MainController {
     }
 
     private void showRssDetails(Rss rss) {
-
+        
         if (rss != null) {
+            final Tooltip tooltipTextURL = new Tooltip();
+            tooltipTextURL.setText(rss.getLinkrss());
             rssSelected = rss;
             lblRssTitle.setText(rss.getTitle());
             lblRssUrl.setText(rss.getLinkrss());
+            lblRssUrl.setTooltip(tooltipTextURL);
+            
+            
             if (rss.getLastsync() != null) {
                 lblRssLastSync.setText("Last sync: " + ConvertionUtil.convertHumanDate(rss.getLastsync()));
             }
@@ -239,9 +248,9 @@ public class MainController {
             enableControls();
 
         } else {
-            lblRssTitle.setText("");
-            lblRssUrl.setText("");
-            lblRssLastSync.setText("Unsynchronized");
+            lblRssTitle.setText("Title: No selected");
+            lblRssUrl.setText("URL:");
+            lblRssLastSync.setText("Sync: Unsynchronized");
 
         }
     }
@@ -482,11 +491,21 @@ public class MainController {
         boolean isClientUse = false;
         File filePath;
         ManageClientBit manageClientBit;
+        
+        if (mainApp.getRssData()!= null && mainApp.getRssData().isEmpty()) {
+            alert = new AlertIcon(Alert.AlertType.WARNING);
+            alert.setTitle("Warning");
+            alert.setContentText("You don't have any RSS to use. Select or Add(+) one");
+            alert.setIcon(mainApp.getIconoApp());
+            alert.showAndWait();
+            return;
+        }
+        
 
         if (mainApp.getMediaFiltersData() != null && mainApp.getMediaFiltersData().isEmpty()) {
             alert = new AlertIcon(Alert.AlertType.WARNING);
             alert.setTitle("Warning");
-            alert.setContentText("Dont you have any filter to apply with this RSS");
+            alert.setContentText("You don't have any filter to apply with this RSS. Add(+) one ");
             alert.setIcon(mainApp.getIconoApp());
             alert.showAndWait();
             return;
@@ -504,7 +523,7 @@ public class MainController {
             filePath = new File(pathDir);
             if (!filePath.exists()) {
                 if (!filePath.mkdirs()) {
-                    throw new Exception("Dont is possible create a folder in: \n" + filePath.getAbsolutePath());
+                    throw new Exception("Is don't possible create a folder in: \n" + filePath.getAbsolutePath());
                 }
             }
 
@@ -700,7 +719,7 @@ public class MainController {
         }
 
         if (serviceRssItemsService.isRunning()) {
-            alert.setContentText("Other task is running");
+            alert.setContentText("Other task is running. Wait a moment to finish the task ");
             alert.showAndWait();
             return;
         }

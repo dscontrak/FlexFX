@@ -22,11 +22,11 @@ import org.apache.http.impl.client.HttpClientBuilder;
 public class DownloadFileHttpCilent {
 
     private final String url;
-    private final String path;
+    private final File fileToSave;
 
-    public DownloadFileHttpCilent(String url, String path) {
+    public DownloadFileHttpCilent(String url, File path) {
         this.url = url;
-        this.path = path;
+        this.fileToSave = path;
     }
 
     public void download() throws IOException {
@@ -44,18 +44,27 @@ public class DownloadFileHttpCilent {
 
             FileOutputStream fos;
             try (InputStream is = entity.getContent()) {
-                String filePath = path;
-                fos = new FileOutputStream(new File(filePath));
+                //String filePath = fileToSave;
+                fos = new FileOutputStream(fileToSave);
                 int inByte;
                 while ((inByte = is.read()) != -1) {
                     fos.write(inByte);
                 }
             }
-            
+
             fos.close();
             System.out.println("File Download Completed!!!");
         }
 
+    }
 
+    public static boolean isFilenameValid(String file) {
+        File f = new File(file);
+        try {
+            f.getCanonicalPath();
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
     }
 }

@@ -5,6 +5,7 @@
  */
 package com.grupoad3.flexfx.util;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 
@@ -27,12 +28,14 @@ public class OpenFile {
     }
 
     public void openWithProcess() throws IOException{
+        Desktop desktop = Desktop.getDesktop();
         if(isLinux()){
             Runtime.getRuntime().exec("xdg-open "+ fileToOpen.getAbsolutePath());
         }else if(isMac()){
             Runtime.getRuntime().exec("open "+ fileToOpen.getAbsolutePath());
         }else if(isWindows()){
-            Runtime.getRuntime().exec("command.com /C start "+ fileToOpen.getAbsolutePath());
+            //Runtime.getRuntime().exec("command.com /C start "+ fileToOpen.getAbsolutePath());
+            desktop.open(fileToOpen);
         }
     }
 

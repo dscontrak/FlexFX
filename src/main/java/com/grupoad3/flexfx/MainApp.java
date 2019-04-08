@@ -25,9 +25,9 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.SplitPane;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -41,7 +41,18 @@ public class MainApp extends Application {
     private final ObservableList<RssItems> rssItemsData = FXCollections.observableArrayList();
     private final ObservableList<MediaFilters> mediaFiltersData = FXCollections.observableArrayList();
     private String currentDirJAR;
+    
+    public final String NAME_APP = "FlexFX";
+    public final String VERSION = "v1.1"; //0 - Version Cero no es para el publico
 
+    public String getNAME_APP() {
+        return NAME_APP;
+    }        
+    
+    public String getNameCompleteApp(){
+        return NAME_APP + " " + VERSION;
+    }
+    
     public synchronized static File getDatabaseFile() {
         return databaseFile;
     }
@@ -88,7 +99,7 @@ public class MainApp extends Application {
 
 
         primaryStage = stage;
-        primaryStage.setTitle("FlexFX");
+        primaryStage.setTitle(getNameCompleteApp());
         primaryStage.getIcons().add(iconoApp);
 
         initProperties();
@@ -113,7 +124,8 @@ public class MainApp extends Application {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("/fxml/MainView.fxml"));
-            BorderPane mainWindow = (BorderPane) loader.load();
+            //BorderPane mainWindow = (BorderPane) loader.load();
+            SplitPane mainWindow = (SplitPane) loader.load();
 
             // Show the scene containing the root layout.
             Scene scene = new Scene(mainWindow);
@@ -251,6 +263,7 @@ public class MainApp extends Application {
             dialoStage.initOwner(primaryStage);
 
             dialoStage.getIcons().add(iconoApp);
+            dialoStage.setResizable(false);
 
             // Scene
             Scene scene = new Scene(page);

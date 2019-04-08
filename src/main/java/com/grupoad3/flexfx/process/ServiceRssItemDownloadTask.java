@@ -10,6 +10,7 @@ import com.grupoad3.flexfx.db.model.ItemStatus;
 import com.grupoad3.flexfx.db.model.RssItems;
 import com.grupoad3.flexfx.db.services.RssItemService;
 import com.grupoad3.flexfx.util.DownloadFileHttpCilent;
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -110,7 +111,7 @@ public class ServiceRssItemDownloadTask extends Service<Boolean> {
                 return true;
             }
 
-            private void downloadAndSave(RssItems itemToAnalize) {
+            private void downloadAndSave(RssItems itemToAnalize) throws IOException {
                 RssItemService db = new RssItemService();
                 // if has been donwloaded return
                 if (itemToAnalize.getStatus().equals(downStatus)) {
@@ -119,8 +120,15 @@ public class ServiceRssItemDownloadTask extends Service<Boolean> {
 
                 String url = itemToAnalize.getLink();
                 String fileName = url.substring(url.lastIndexOf('/') + 1, url.length());
+                File fileToSave = null;
+                
+                if(DownloadFileHttpCilent.isFilenameValid(fileName) == false){
+                    fileToSave = File.createTempFile(itemToAnalize.getMediafilter().getFiltermain(), ".torrent", new File(path));                        
+                }else{
+                    fileToSave = new File(path + "/" + fileName);
+                }
 
-                DownloadFileHttpCilent downloadFile = new DownloadFileHttpCilent(url, path + "/" + fileName);
+                DownloadFileHttpCilent downloadFile = new DownloadFileHttpCilent(url, fileToSave);
                 
                 try {
                     downloadFile.download();
@@ -129,7 +137,7 @@ public class ServiceRssItemDownloadTask extends Service<Boolean> {
                     itemToAnalize.setStatus(ItemStatus.ERROR);
                 }
                 
-                itemToAnalize.setFile(fileName);
+                itemToAnalize.setFile(fileToSave.getName());
                 itemToAnalize.setDatedown(LocalDateTime.now());
 
                 try {                    

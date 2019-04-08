@@ -147,7 +147,7 @@ public class RssController {
                 serviceRssService.setOnFailed(eventFail -> {
                     serviceRssService.getException().printStackTrace(System.err);
                     hboxProgress.setVisible(false);
-                    mainApp.showAlertWithEx(serviceRssService.getException());
+                        mainApp.showAlertWithEx(serviceRssService.getException());
                 });
 
                 // event success

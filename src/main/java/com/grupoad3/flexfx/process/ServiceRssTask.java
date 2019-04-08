@@ -124,6 +124,7 @@ public class ServiceRssTask extends Service<Rss> {
 
                 } catch (IOException e) {
                     e.printStackTrace();
+                    throw e;
                 }
 
 
