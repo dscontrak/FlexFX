@@ -65,3 +65,8 @@ git clone https://github.com/dscontrak/FlexFX.git
 ```
 
 Open folder with Netbeans and do your changes and send a pull request.
+
+## Help
+
+1. Test my App
+2. If you think this App is useful, please press the star(★) button at the top.
