@@ -5,8 +5,9 @@ Alternative to FlexGet.
 ## Dowload and Run
 
 1. Download from [release area.](https://github.com/dscontrak/FlexFX/releases)
-2. Uncompress the file on any folder in your pc.
-3. And click on next file to run.
+2. (Optional, if you have installed JAVA 8+ in your PC)Install JAVA 8, [Tuto](https://github.com/jagrosh/MusicBot/wiki/Installing-JDK1.8).
+3. Uncompress the file on any folder in your pc.
+4. And click on next file to run.
 
 ### Run Windows
 
