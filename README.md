@@ -5,7 +5,7 @@ Alternative to FlexGet.
 ## Dowload and Run
 
 1. Download from [release area.](https://github.com/dscontrak/FlexFX/releases)
-2. (Optional, if you have installed JAVA 8+ in your PC)Install JAVA 8, [Tuto](https://github.com/jagrosh/MusicBot/wiki/Installing-JDK1.8).
+2. (Optional, if you have installed JAVA 8+ in your PC) Install JAVA 8, [Tuto to install](http://android-turtlegrafik.ch/english/index.php?inhalt_mitte=editor/jreEnglish.inc.php).
 3. Uncompress the file on any folder in your pc.
 4. And click on next file to run.
 
@@ -58,6 +58,7 @@ In this moement only `qBittorrent 4.2.+` is supported.
 - Netbeans `8.2.+`
 - Maven
 - Scene Builder `8.5.+`
+- JDK 8 [Tuto](https://github.com/jagrosh/MusicBot/wiki/Installing-JDK1.8).
 
 ### Download and Changes
 
