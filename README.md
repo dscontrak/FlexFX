@@ -51,7 +51,7 @@ chmod +x javafx-unix.sh
 
 In this moement only `qBittorrent 4.2.+` is supported.
 
-## Developed
+## Developing
 
 ### Requirements
 
