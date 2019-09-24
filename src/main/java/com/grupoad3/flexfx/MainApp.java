@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
@@ -41,9 +42,11 @@ public class MainApp extends Application {
     private final ObservableList<RssItems> rssItemsData = FXCollections.observableArrayList();
     private final ObservableList<MediaFilters> mediaFiltersData = FXCollections.observableArrayList();
     private String currentDirJAR;
+    private Properties buildProperties;
     
     public final String NAME_APP = "FlexFX";
-    public final String VERSION = "v1.1"; //0 - Version Cero no es para el publico
+    public String VERSION = "v0"; //0 - Version Cero no es para el publico
+    
 
     public String getNAME_APP() {
         return NAME_APP;
@@ -96,15 +99,16 @@ public class MainApp extends Application {
         if (databaseFile.exists() == false) {
                 databaseFile.createNewFile();
         }
-
-
-        primaryStage = stage;
-        primaryStage.setTitle(getNameCompleteApp());
-        primaryStage.getIcons().add(iconoApp);
+        
 
         initProperties();
         initDBMigration();
         initData();
+        initBuildData();
+        
+        primaryStage = stage;        
+        primaryStage.getIcons().add(iconoApp);
+        primaryStage.setTitle(getNameCompleteApp());
 
         showMainViewWindow();
     }
@@ -321,6 +325,16 @@ public class MainApp extends Application {
         } catch (Exception e) {
             showAlertWithEx(e);
             return false;
+        }
+    }
+
+    private void initBuildData() throws IOException {
+        ClassLoader loader = Thread.currentThread().getContextClassLoader(); 
+        buildProperties = new Properties();
+        buildProperties.load(   loader.getResourceAsStream( "build.properties" ) );
+        
+        if(buildProperties != null && buildProperties.size() > 0){
+            VERSION = buildProperties.getProperty("build.version");
         }
     }
 

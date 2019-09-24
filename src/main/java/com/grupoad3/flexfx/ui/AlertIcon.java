@@ -50,7 +50,7 @@ public class AlertIcon extends Alert{
         }
 
         setHeaderText(null);
-        getDialogPane().setMinWidth(Region.USE_PREF_SIZE);
+        getDialogPane().setPrefWidth(800);
         
 
     }
@@ -90,7 +90,7 @@ public class AlertIcon extends Alert{
 
         String stackTrace = getStackTrace(ex);
         TextArea textArea = new TextArea();
-        textArea.setMaxWidth(200);
+        
         textArea.setText(stackTrace);
 
         dialogPaneContent.getChildren().addAll(label, textArea);

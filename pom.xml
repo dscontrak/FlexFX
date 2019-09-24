@@ -14,6 +14,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mainClass>com.grupoad3.flexfx.MainApp</mainClass>
+        <timestamp>${maven.build.timestamp}</timestamp>
+        <maven.build.timestamp.format>dd-MM-yyyy HH:mm</maven.build.timestamp.format>
     </properties>
 
     <organization>
@@ -21,7 +23,7 @@
         <name>None</name>
     </organization>
 
-    <build>
+    <build>        
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -105,10 +107,14 @@
                 </configuration>
             </plugin>
         </plugins>
-        
+        <!-- Para copiar los archivos de propiedades al directorio y no al JAR -->
         <resources>
-            <!-- Para copiar los archivos de propiedades al directorio y no al JAR -->
-           
+            <!-- Para poner lo del build.properties las propiedades respectivas 
+                    https://memorynotfound.com/maven-build-information-properties-file/ -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
         </resources>
     </build>
     
