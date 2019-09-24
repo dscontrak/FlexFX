@@ -17,6 +17,6 @@ jobs:
       with:
         java-version: 1.8
     - name: Install OpenJFX
-      run: sudo apt-get install openjfx    
+      run: sudo apt-get update && sudo apt-get install openjfx    
     - name: Build with Maven
       run: mvn package
