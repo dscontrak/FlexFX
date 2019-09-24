@@ -18,53 +18,67 @@ import java.util.List;
  */
 @SuppressWarnings("unchecked")
 public class RssService extends AbstractDaoService<Rss>{
-    
+
     public RssService() {
-        super(Rss.class);        
+        super(Rss.class);
     }
-    
+
     public List<Rss> getLastRssNotDeleted() throws IOException{
         return getLastRss(40, 0, false);
     }
-    
+
     public List<Rss> getLastRss(long limit, long offset, boolean withDeleted) throws IOException{
-        
+
         // return all with deleted
         if (withDeleted) {
             return super.getAll(limit, offset);
         }else{
-        
+
             try {
-                QueryBuilder builder = dao.queryBuilder();                
+                QueryBuilder builder = dao.queryBuilder();
                 if(limit != -1l)
                 {
                     builder.limit(limit);
                 }
-                
+
                 if(offset != -1l){
                     builder.offset(offset);
                 }
-                
+
                 builder.where().eq(Rss.DELETED_FIELD_NAME, withDeleted);
                 return builder.query();
-                
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        
+
         return null;
     }
-    
+
     public boolean eraserSoft(Rss rss) throws IOException{
-        
+
         try {
             rss.setDeleted(true);
             return dao.update(rss) > 0;
         } catch (SQLException e) {
-            e.printStackTrace();       
+            e.printStackTrace();
             throw new IOException(e);
-        }                
+        }
     }
-    
+
+    public Rss getByLinkRss(Rss rss) {
+        try {
+            QueryBuilder builder = dao.queryBuilder();
+            builder.where()
+                    .eq(Rss.LINK_RSS_FIELD_NAME, rss.getLinkrss());
+            return (Rss)builder.queryForFirst();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
 }

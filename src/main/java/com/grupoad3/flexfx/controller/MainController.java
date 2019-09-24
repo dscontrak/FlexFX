@@ -69,7 +69,7 @@ public class MainController {
 
     @FXML
     private Label lblNameApp;
-    
+
     @FXML
     private Label lblRssTitle;
 
@@ -229,7 +229,7 @@ public class MainController {
     }
 
     private void showRssDetails(Rss rss) {
-        
+
         if (rss != null) {
             final Tooltip tooltipTextURL = new Tooltip();
             tooltipTextURL.setText(rss.getLinkrss());
@@ -237,8 +237,8 @@ public class MainController {
             lblRssTitle.setText(rss.getTitle());
             lblRssUrl.setText(rss.getLinkrss());
             lblRssUrl.setTooltip(tooltipTextURL);
-            
-            
+
+
             if (rss.getLastsync() != null) {
                 lblRssLastSync.setText("Last sync: " + ConvertionUtil.convertHumanDate(rss.getLastsync()));
             }
@@ -432,6 +432,7 @@ public class MainController {
                 //rssService.deleteById(new Long(rssSelected.getId()));
                 boolean isAffected = rssService.eraserSoft(rssSelected);
                 if (isAffected) {
+                    mainApp.getRssItemsData().clear();
                     mainApp.getRssData().remove(rssSelected);
                 }
 
@@ -491,7 +492,7 @@ public class MainController {
         boolean isClientUse = false;
         File filePath;
         ManageClientBit manageClientBit;
-        
+
         if (mainApp.getRssData()!= null && mainApp.getRssData().isEmpty()) {
             alert = new AlertIcon(Alert.AlertType.WARNING);
             alert.setTitle("Warning");
@@ -500,7 +501,7 @@ public class MainController {
             alert.showAndWait();
             return;
         }
-        
+
 
         if (mainApp.getMediaFiltersData() != null && mainApp.getMediaFiltersData().isEmpty()) {
             alert = new AlertIcon(Alert.AlertType.WARNING);

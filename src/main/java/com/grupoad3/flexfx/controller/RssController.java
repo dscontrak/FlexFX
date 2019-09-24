@@ -185,6 +185,8 @@ public class RssController {
         RssService rssService;
         InputValidatorHelper validator = isInputValid();
 
+        Rss rssEncotrado = null;
+
         if (currentRss == null) {
             return;
         }
@@ -200,10 +202,21 @@ public class RssController {
                 currentRss.setDescription(txtDescription.getText());
                 currentRss.setLinkweb(txtWeb.getText());
 
-                if(currentRss.getId() == null || currentRss.getId() == 0){
+                rssEncotrado = rssService.getByLinkRss(currentRss);
+
+                if(rssEncotrado == null){
                     rssService.create(currentRss);
                 }else{
+
+                    currentRss.setId(rssEncotrado.getId());
+                    currentRss.setPubdate(rssEncotrado.getPubdate());
+                    currentRss.setLastsync(rssEncotrado.getLastsync());
+                    currentRss.setItemmostnew(rssEncotrado.getItemmostnew());
+                    currentRss.setDeleted(false);
+
+
                     rssService.update(currentRss);
+
                 }
 
                 isSaved = true;

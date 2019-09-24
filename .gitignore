@@ -8,3 +8,4 @@ config.properties
 *.epgz
 /nbproject/
 downloads/
+.bak
